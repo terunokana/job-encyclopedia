@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>職業名鑑 p.13 診療放射線技師</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Noto+Sans+JP:wght@300;400;500&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #131929;
+    --panel2: #0e1520;
+    --border: #1e2d4a;
+    --accent: #4affb4;
+    --accent2: #7b6fff;
+    --gold: #ffd166;
+    --red: #ff3355;
+    --orange: #ff7744;
+    --rad: #00ccff;
+    --rad2: #0066cc;
+    --text: #c8d8f0;
+    --text-dim: #4a6a8a;
+    --white: #e8f0ff;
+    --str: #ff7744; --con: #ff5533; --dex: #44ddff;
+    --int: #4affb4; --wis: #7b6fff; --cha: #ff6b9d;
+    --per: #00ccff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Noto Sans JP',sans-serif; min-height:100vh; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:0;
+  }
+  body::after {
+    content:''; position:fixed; inset:0;
+    background: radial-gradient(ellipse 60% 40% at 70% 30%, rgba(0,204,255,0.04) 0%, transparent 60%);
+    pointer-events:none; z-index:0;
+  }
+  .page { max-width:680px; margin:0 auto; padding:48px 24px 100px; position:relative; z-index:1; }
+
+  /* ヘッダー */
+  .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:40px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+  .page-meta { font-family:'DotGothic16',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.2em; }
+  .page-num  { font-family:'DotGothic16',monospace; font-size:11px; color:var(--rad); letter-spacing:0.15em; }
+
+  /* タイトル */
+  .job-title-block { margin-bottom:32px; animation:fadeUp 0.6s ease both; }
+  .job-system { font-family:'DotGothic16',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.2em; margin-bottom:8px; }
+  .job-system span { color:var(--rad); }
+  .job-name { font-family:'Noto Serif JP',serif; font-weight:900; font-size:clamp(36px,8vw,58px); color:var(--white); letter-spacing:0.05em; line-height:1; margin-bottom:12px; }
+  .job-name-en { font-family:'DotGothic16',monospace; font-size:11px; color:var(--text-dim); letter-spacing:0.2em; margin-bottom:20px; }
+
+  /* バッジ */
+  .heal-badges { display:flex; gap:6px; flex-wrap:wrap; }
+  .badge { font-family:'DotGothic16',monospace; font-size:10px; padding:3px 10px; }
+  .badge-debuff  { background:rgba(74,255,180,0.08);  color:var(--accent);  border:1px solid rgba(74,255,180,0.25); }
+  .badge-rad     { background:rgba(0,204,255,0.1);    color:var(--rad);     border:1px solid rgba(0,204,255,0.3); }
+  .badge-secret  { background:rgba(0,204,255,0.06);   color:var(--rad);     border:1px solid rgba(0,204,255,0.2); }
+  .badge-prevent { background:rgba(255,209,102,0.08); color:var(--gold);    border:1px solid rgba(255,209,102,0.25); }
+
+  /* キャッチ */
+  .catch-copy { background:var(--panel); border-left:3px solid var(--rad); padding:16px 20px; margin-bottom:32px; font-size:14px; line-height:2; color:var(--text); animation:fadeUp 0.6s ease 0.1s both; }
+  .catch-copy strong { color:var(--white); }
+  .catch-copy .dim { color:var(--text-dim); font-size:12px; }
+
+  /* ステータス */
+  .status-block { background:var(--panel2); border:1px solid var(--border); padding:24px; margin-bottom:24px; animation:fadeUp 0.6s ease 0.2s both; }
+  .status-header { font-family:'DotGothic16',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.25em; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+  .status-header::after { content:''; flex:1; height:1px; background:var(--border); }
+  .stat-row { display:grid; grid-template-columns:52px 1fr 20px; gap:12px; align-items:center; margin-bottom:12px; }
+  .stat-row:last-child { margin-bottom:0; }
+  .stat-label { font-family:'DotGothic16',monospace; font-size:12px; }
+  .stat-bar-wrap { height:6px; background:rgba(255,255,255,0.04); }
+  .stat-bar { height:100%; position:relative; }
+  .stat-bar.max { box-shadow:0 0 8px currentColor; }
+  .stat-bar::after { content:''; position:absolute; right:0; top:0; width:1px; height:100%; background:rgba(255,255,255,0.5); }
+  .stat-val { font-family:'DotGothic16',monospace; font-size:11px; color:var(--text-dim); text-align:right; }
+  .stat-note { grid-column:2/4; font-size:10px; color:var(--text-dim); margin-top:-6px; margin-bottom:4px; font-style:italic; }
+  .divider-line { border:none; border-top:1px solid var(--border); margin:16px 0; }
+
+  /* 職業特性 */
+  .trait-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; animation:fadeUp 0.6s ease 0.3s both; }
+  .trait-box { background:var(--panel2); border:1px solid var(--border); padding:14px 12px; text-align:center; }
+  .trait-icon { font-size:22px; display:block; margin-bottom:6px; }
+  .trait-name { font-family:'DotGothic16',monospace; font-size:9px; color:var(--text-dim); letter-spacing:0.1em; margin-bottom:6px; }
+  .trait-stars { font-family:'DotGothic16',monospace; font-size:11px; }
+
+  /* セクション */
+  .section { margin-bottom:32px; animation:fadeUp 0.6s ease 0.4s both; }
+  .section-label { font-family:'DotGothic16',monospace; font-size:10px; letter-spacing:0.25em; color:var(--text-dim); margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* 検査カタログ */
+  .exam-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  @media(max-width:480px){ .exam-grid { grid-template-columns:1fr; } }
+  .exam-item { background:var(--panel2); border:1px solid var(--border); border-left:2px solid var(--item-color,var(--rad)); padding:10px 14px; }
+  .exam-name { font-size:13px; color:var(--white); font-weight:500; margin-bottom:4px; }
+  .exam-desc { font-size:11px; color:var(--text-dim); line-height:1.6; }
+  .exam-tag  { font-family:'DotGothic16',monospace; font-size:9px; color:var(--item-color,var(--rad)); margin-bottom:4px; }
+
+  /* タイムライン */
+  .timeline { display:flex; flex-direction:column; }
+  .tl-item { display:grid; grid-template-columns:52px 16px 1fr; gap:0 12px; }
+  .tl-time { font-family:'DotGothic16',monospace; font-size:11px; color:var(--text-dim); padding:10px 0; text-align:right; }
+  .tl-dot-col { display:flex; flex-direction:column; align-items:center; }
+  .tl-dot { width:6px; height:6px; border-radius:50%; background:var(--border); margin-top:14px; flex-shrink:0; }
+  .tl-dot.rad    { background:var(--rad);    box-shadow:0 0 6px var(--rad); }
+  .tl-dot.gold   { background:var(--gold);   box-shadow:0 0 6px var(--gold); }
+  .tl-dot.normal { background:var(--accent); }
+  .tl-line { flex:1; width:1px; background:var(--border); }
+  .tl-content { padding:8px 0; font-size:13px; line-height:1.7; }
+  .tl-title { color:var(--white); font-weight:500; margin-bottom:2px; }
+  .tl-sub   { font-size:11px; color:var(--text-dim); }
+  .tl-rad   { font-size:12px; color:var(--rad); }
+
+  /* リアルボックス */
+  .real-box { background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--gold); padding:20px; margin-bottom:12px; }
+  .real-box-title { font-family:'DotGothic16',monospace; font-size:10px; color:var(--gold); letter-spacing:0.2em; margin-bottom:10px; }
+  .real-box-text { font-size:13px; line-height:2; color:var(--text); }
+  .real-box-text strong { color:var(--white); }
+  .real-box-text .dim { color:var(--text-dim); font-size:12px; }
+
+  /* 被ばくボックス */
+  .rad-box { background:rgba(0,204,255,0.04); border:1px solid rgba(0,204,255,0.2); border-left:3px solid var(--rad); padding:20px; margin-bottom:12px; }
+  .rad-box-title { font-family:'DotGothic16',monospace; font-size:10px; color:var(--rad); letter-spacing:0.2em; margin-bottom:10px; }
+  .rad-box-text { font-size:13px; line-height:2; color:var(--text); }
+  .rad-box-text strong { color:var(--white); }
+  .rad-box-text .dim { color:var(--text-dim); font-size:12px; }
+
+  /* 警告ボックス */
+  .warn-box { background:var(--panel); border:1px solid rgba(255,119,68,0.25); border-left:3px solid var(--orange); padding:16px 20px; margin-bottom:12px; }
+  .warn-title { font-family:'DotGothic16',monospace; font-size:10px; color:var(--orange); letter-spacing:0.2em; margin-bottom:8px; }
+  .warn-text { font-size:12px; color:var(--text-dim); line-height:1.8; }
+  .warn-text strong { color:var(--text); }
+
+  /* なるには */
+  .path-list { display:flex; flex-direction:column; gap:8px; }
+  .path-item { display:grid; grid-template-columns:24px 1fr; gap:10px; align-items:baseline; }
+  .path-num { font-family:'DotGothic16',monospace; font-size:10px; color:var(--rad); text-align:center; }
+  .path-text { font-size:13px; line-height:1.8; color:var(--text); }
+  .path-text .sub { font-size:11px; color:var(--text-dim); display:block; }
+  .path-text .age { color:var(--rad); font-family:'DotGothic16',monospace; font-size:12px; }
+
+  /* データ */
+  .data-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .data-item { background:var(--panel2); border:1px solid var(--border); padding:12px 16px; }
+  .data-label { font-family:'DotGothic16',monospace; font-size:9px; color:var(--text-dim); letter-spacing:0.15em; margin-bottom:6px; }
+  .data-value { font-size:14px; color:var(--white); font-weight:500; }
+  .data-value .sub { font-size:11px; color:var(--text-dim); font-weight:300; }
+
+  /* 社会的影響 */
+  .impact-box { background:var(--panel); border:1px solid rgba(0,204,255,0.2); padding:20px; }
+  .impact-title { font-family:'DotGothic16',monospace; font-size:10px; color:var(--rad); letter-spacing:0.2em; margin-bottom:10px; }
+  .impact-text { font-size:13px; line-height:2; color:var(--text); }
+
+  /* 関連職 */
+  .related-list { display:flex; flex-direction:column; }
+  .related-item { display:flex; align-items:baseline; gap:12px; padding:10px 0; border-bottom:1px solid rgba(30,45,74,0.5); }
+  .related-name { font-size:13px; color:var(--white); white-space:nowrap; }
+  .related-diff { font-size:12px; color:var(--text-dim); line-height:1.6; }
+
+  /* 創作メモ */
+  .creative-box { background:var(--panel); border:1px solid rgba(0,204,255,0.25); padding:20px; margin-top:8px; }
+  .creative-title { font-family:'DotGothic16',monospace; font-size:10px; color:var(--rad); letter-spacing:0.2em; margin-bottom:12px; }
+  .creative-list { display:flex; flex-direction:column; gap:8px; }
+  .creative-item { display:grid; grid-template-columns:16px 1fr; gap:8px; font-size:12px; line-height:1.7; color:var(--text-dim); }
+  .creative-item::before { content:'▸'; color:var(--rad); font-family:'DotGothic16',monospace; }
+
+  /* フッター */
+  .card-footer { margin-top:48px; padding-top:24px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .footer-series { font-family:'DotGothic16',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.15em; line-height:1.8; }
+  .footer-nav { font-family:'DotGothic16',monospace; font-size:11px; color:var(--rad); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <span class="page-meta">職業名鑑 Vol.1 ── ヒーラー系統 ／ コメディカル系</span>
+    <span class="page-num">p.13</span>
+  </div>
+
+  <div class="job-title-block">
+    <div class="job-system">系統：<span>調べる・癒す（クロスジョブ）</span>　／　ジョブ：<span>セージ＋ヒーラー（デバフ検知特化型）</span></div>
+    <h1 class="job-name">診療放射線技師</h1>
+    <div class="job-name-en">RADIOLOGICAL TECHNOLOGIST</div>
+    <div class="heal-badges">
+      <span class="badge badge-rad">放射線専門職</span>
+      <span class="badge badge-debuff">デバフ検知</span>
+      <span class="badge badge-prevent">予防・早期発見</span>
+      <span class="badge badge-secret">秘匿度 ★★★★★</span>
+    </div>
+  </div>
+
+  <div class="catch-copy">
+    レントゲンを撮る人の名前を、ほとんどの人は知らない。<br>
+    その正式名称が<strong>「診療放射線技師」</strong>だ。<br>
+    <strong>医師・歯科医師以外で唯一、人体に放射線を照射できる</strong>国家資格者。<br>
+    CT・MRI・マンモグラフィ・放射線治療──<br>
+    現代医療の「見る・探す・当てる」を全て担う存在でありながら、<br>
+    患者はその名前を知らないまま帰っていく。<br>
+    <span class="dim">── 病気を見つけるのは医師だが、見えるようにするのは診療放射線技師だ。</span>
+  </div>
+
+  <!-- ステータス -->
+  <div class="status-block">
+    <div class="status-header">ABILITY STATUS</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--str);">STR</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:40%; background:var(--str);"></div></div>
+      <span class="stat-val">2</span>
+    </div>
+    <div class="stat-note">寝たきり患者のポジショニング・重い機材の操作など。力仕事は少ないが体力は必要</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--con);">CON</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; background:var(--con);"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+    <div class="stat-note">大病院では当直・オンコールあり。立ちっぱなしの検査が続くこともある</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--dex);">DEX</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--dex);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">患者の体位合わせ・機器操作・照射角度の精密な調整。「1mm のズレ」が診断に影響する</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--int);">INT</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%; background:var(--int);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">放射線物理・解剖学・病理・機器工学・放射線生物学・防護学。守備範囲が極めて広い</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--wis);">WIS</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--wis);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">「この画像、おかしくないか」を撮影中に気づく判断力。医師への進言が命を救うこともある</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--cha);">CHA</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; background:var(--cha);"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+    <div class="stat-note">患者に短時間で信頼される対応・恐怖を和らげる声かけ。検査の質に直結する</div>
+
+    <hr class="divider-line">
+    <div class="status-header">CONDITIONAL STATUS</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--per);">PER</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--per);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">画像の微細な異常を見抜く「目」。同じ画像でも技師の経験値で気づきが変わる。全職業でPER最高峰クラス</div>
+
+  </div>
+
+  <!-- 職業特性 -->
+  <div class="trait-row">
+    <div class="trait-box">
+      <span class="trait-icon">🔮</span>
+      <div class="trait-name">ヒーラー度</div>
+      <div class="trait-stars" style="color:var(--rad);">████░</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">間接・検知型</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">💀</span>
+      <div class="trait-name">精神汚染度</div>
+      <div class="trait-stars" style="color:var(--red);">██░░░</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">低め・安定</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">👁</span>
+      <div class="trait-name">秘匿度</div>
+      <div class="trait-stars" style="color:var(--rad);">█████</div>
+      <div style="font-size:10px; color:var(--rad); margin-top:4px;">名前を知らない人が大多数</div>
+    </div>
+  </div>
+
+  <!-- 「見えるようにする」仕事 -->
+  <div class="section">
+    <div class="section-label">ROLE ── 「見えるようにする」専門家</div>
+    <div class="rad-box">
+      <div class="rad-box-title">☢ 医師・歯科医師以外で唯一の放射線照射権限</div>
+      <div class="rad-box-text">
+        放射線は使い方を誤ると人体に深刻なダメージを与える。<br>
+        だからこそ法律で<strong>「照射できるのは医師・歯科医師・診療放射線技師のみ」</strong>と定められている。<br><br>
+        しかしほとんどの患者は「レントゲン室に入ってきた人」として認識するだけで、<br>
+        その人が<strong>国家資格を持つ唯一の専門職</strong>だとは知らない。<br>
+        <span class="dim">── 秘匿度★★★★★の最大の理由がここにある。</span>
+      </div>
+    </div>
+    <div class="real-box" style="border-left-color:var(--rad); margin-top:10px;">
+      <div class="real-box-title" style="color:var(--rad);">▸ 「撮るだけ」ではない──画像の質が診断の質を決める</div>
+      <div class="real-box-text">
+        同じ機械を使っても、<strong>技師の経験と技術で画像の質が変わる</strong>。<br>
+        体位・角度・照射量・タイミング── 全ての選択が最終的な画像に反映される。<br>
+        優れた技師は撮影中に「この影、気になる」と気づき、<strong>医師に進言することがある</strong>。<br>
+        その一言で見落とされるはずだった病変が発見されることも珍しくない。<br>
+        <span class="dim">── 「撮影」は技術職であり、「読影補助」は判断職でもある。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 検査カタログ -->
+  <div class="section">
+    <div class="section-label">CATALOG ── 担当する検査の種類</div>
+    <div class="exam-grid">
+      <div class="exam-item" style="--item-color:var(--rad);">
+        <div class="exam-tag">☢ 放射線使用</div>
+        <div class="exam-name">一般X線撮影</div>
+        <div class="exam-desc">レントゲン。胸部・骨・腹部。最も基本の検査。全国どこでも毎日行われる</div>
+      </div>
+      <div class="exam-item" style="--item-color:var(--rad);">
+        <div class="exam-tag">☢ 放射線使用</div>
+        <div class="exam-name">CT検査</div>
+        <div class="exam-desc">X線で体の断面を360度撮影。3D再構成も可能。骨折・腫瘍・血管を立体的に診る</div>
+      </div>
+      <div class="exam-item" style="--item-color:var(--rad);">
+        <div class="exam-tag">☢ 放射線使用</div>
+        <div class="exam-name">血管造影検査</div>
+        <div class="exam-desc">カテーテルを血管に挿入し造影剤を投与してX線撮影。動脈瘤・狭窄の診断に必須</div>
+      </div>
+      <div class="exam-item" style="--item-color:var(--rad);">
+        <div class="exam-tag">☢ 放射線使用</div>
+        <div class="exam-name">マンモグラフィ</div>
+        <div class="exam-desc">乳がん早期発見のX線検査。女性患者への対応から女性技師の需要が高い</div>
+      </div>
+      <div class="exam-item" style="--item-color:var(--accent2);">
+        <div class="exam-tag">✦ 放射線不使用</div>
+        <div class="exam-name">MRI検査</div>
+        <div class="exam-desc">磁気と電波で体の断面を撮影。放射線なし。脳・脊髄・軟部組織に強い</div>
+      </div>
+      <div class="exam-item" style="--item-color:var(--accent2);">
+        <div class="exam-tag">✦ 放射線不使用</div>
+        <div class="exam-name">超音波（エコー）</div>
+        <div class="exam-desc">超音波で臓器・血管・胎児を観察。妊婦健診・腹部臓器に広く使用</div>
+      </div>
+      <div class="exam-item" style="--item-color:var(--gold);">
+        <div class="exam-tag">⚡ 治療</div>
+        <div class="exam-name">放射線治療</div>
+        <div class="exam-desc">がん細胞にピンポイントで放射線を当てる治療。照射計画から実施まで担当</div>
+      </div>
+      <div class="exam-item" style="--item-color:var(--gold);">
+        <div class="exam-tag">⚡ 治療・診断</div>
+        <div class="exam-name">核医学検査（RI検査）</div>
+        <div class="exam-desc">微量の放射性物質を体内に投与して臓器の機能を画像化。PET検査もここに含まれる</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1日の流れ -->
+  <div class="section">
+    <div class="section-label">DAILY FLOW ── 1日の流れ（大病院勤務の場合）</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <span class="tl-time">8:30</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">機器の始業点検・品質管理</div>
+          <div class="tl-sub">X線量・MRIの磁場強度・画像の精度を毎日確認。機器管理も技師の仕事</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-time">9:00</span>
+        <div class="tl-dot-col"><div class="tl-dot rad"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">一般撮影・外来CT・MRI対応</div>
+          <div class="tl-sub">次々と来る外来患者の検査をこなす。1日に数十件〜百件超えることも<br>
+          <span class="tl-rad">患者ごとに体格・症状が違う。毎回「最適な一枚」を判断して撮る</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-time">随時</span>
+        <div class="tl-dot-col"><div class="tl-dot gold"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">緊急CT・救急対応</div>
+          <div class="tl-sub">救急搬送された患者が来たら優先対応<br>
+          <span class="tl-rad">「脳出血か梗塞か」を判断するCTは、時間が命に直結する</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-time">午後</span>
+        <div class="tl-dot-col"><div class="tl-dot rad"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">放射線治療・血管造影の介助</div>
+          <div class="tl-sub">がん患者への照射治療や血管内治療の検査介助。高度な専門性が必要な領域</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-time">夜間</span>
+        <div class="tl-dot-col"><div class="tl-dot gold"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">当直・オンコール（大病院のみ）</div>
+          <div class="tl-sub">
+          <span class="tl-rad">夜間の緊急CT・MRIは技師が呼ばれて対応。深夜でも「撮れる技師」が必要</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 被ばくについて -->
+  <div class="section">
+    <div class="section-label">RADIATION ── 被ばくについての本当のこと</div>
+    <div class="rad-box">
+      <div class="rad-box-title">☢ 技師自身の被ばくリスクは？</div>
+      <div class="rad-box-text">
+        診療放射線技師は<strong>「放射線を毎日浴びている」と思われがちだが、実際は違う</strong>。<br>
+        X線照射中は技師は防護室の外に出るか、鉛入りの防護衣を着用する。<br>
+        法律で年間の被ばく線量上限が定められており、<strong>線量計で毎日管理されている</strong>。<br><br>
+        患者が受ける被ばくを最小限にする「被ばく低減」も技師の重要な仕事だ。<br>
+        <span class="dim">── 「放射線を扱うプロ」だからこそ、最も放射線から距離を置く方法を知っている。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- なるには -->
+  <div class="section">
+    <div class="section-label">HOW TO ── なるには？</div>
+    <div class="path-list">
+      <div class="path-item">
+        <span class="path-num">01</span>
+        <div class="path-text">
+          診療放射線技師養成課程のある大学（4年）または専門学校（3年）へ進学
+          <span class="sub"><span class="age">18歳入学。</span>文部科学大臣指定の養成校のみ。通信教育では取得不可</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">02</span>
+        <div class="path-text">
+          診療放射線技師国家試験に合格
+          <span class="sub"><span class="age">最短21歳（3年制専門学校）。</span>合格率約80%。毎年2月実施</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">03</span>
+        <div class="path-text">
+          病院・クリニック・検診センターなどに就職
+          <span class="sub">国家資格があれば全国どこでも働ける。転職・復職しやすい</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">04</span>
+        <div class="path-text">
+          専門認定資格の取得（任意・キャリアアップ）
+          <span class="sub">CT・MRI・マンモグラフィ・放射線治療など各学会の認定資格で専門性を高める</span>
+        </div>
+      </div>
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <div class="warn-title">▸ 「放射線技師」と「放射線科医」は全く別の職業</div>
+      <div class="warn-text">
+        <strong>診療放射線技師</strong>：撮影・検査を実施する技術職（国家資格・3〜4年養成）<br>
+        <strong>放射線科医</strong>：画像を読影・診断する医師（医学部6年＋研修）<br>
+        両者は同じ放射線科で連携して働くが、<strong>全く異なる職種・資格・養成期間</strong>だ。
+      </div>
+    </div>
+  </div>
+
+  <!-- データ -->
+  <div class="section">
+    <div class="section-label">DATA ── 数字で見る診療放射線技師</div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="data-label">平均年収</div>
+        <div class="data-value">557万円<span class="sub">（2025年・コメディカルで薬剤師に次ぐ2位）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">全国の病院在籍者数</div>
+        <div class="data-value">約5万人<span class="sub">（病院のみ。クリニック等含むと更に多い）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">最短で免許取得の年齢</div>
+        <div class="data-value">21歳<span class="sub">（3年制専門学校・現役一発合格）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">将来性</div>
+        <div class="data-value">★★★★★<span class="sub">（AI画像診断との協働で需要拡大）</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 社会的影響 -->
+  <div class="section">
+    <div class="section-label">IMPACT ── この職業がないと？</div>
+    <div class="impact-box">
+      <div class="impact-title">⚠ 診療放射線技師がいなくなったら</div>
+      <div class="impact-text">
+        CT・MRI・レントゲンが全て止まる。<br>
+        骨折・肺炎・脳出血・がんの早期発見が不可能になる。<br>
+        現代医療の診断の大部分は「画像があること」を前提に成り立っており、<br>
+        <strong>画像なしでは医師は手術も薬の選択も難しくなる</strong>。<br>
+        放射線治療を受けているがん患者の治療も全て止まる。<br>
+        <span style="color:var(--text-dim); font-size:12px;">── 「見えない場所」を「見える化」する技術なしに、現代医療は存在できない。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 似てるけど違う -->
+  <div class="section">
+    <div class="section-label">SIMILAR BUT DIFFERENT ── 似てるけど違う職業</div>
+    <div class="related-list">
+      <div class="related-item">
+        <span class="related-name">放射線科医</span>
+        <span class="related-diff">医師。画像を「読んで診断する」側。技師が撮った画像を解釈して病名を判断する。医学部6年+研修が必要</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">臨床検査技師</span>
+        <span class="related-diff">血液・尿・組織を検査する。放射線は原則扱わない。心電図・超音波（一部）を担当することも</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">臨床工学技士</span>
+        <span class="related-diff">医療機器全般の操作・管理が専門。放射線機器より人工呼吸器・透析・心臓カテーテルを担当</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">医学物理士</span>
+        <span class="related-diff">放射線治療の物理的な計算・品質管理の専門家。技師より理工学寄り。日本では非常に少ない</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 創作設定メモ -->
+  <div class="section">
+    <div class="section-label">FOR CREATORS ── 創作設定メモ</div>
+    <div class="creative-box">
+      <div class="creative-title">▸ このキャラを主人公にするなら</div>
+      <div class="creative-list">
+        <div class="creative-item">PER最高峰＋INT5── 「見えないものを見る」専門家として探偵・調査系キャラに転用しやすい</div>
+        <div class="creative-item">撮影中に「おかしな影」に気づく── 医師より先に異変を発見するが「診断権限がない」ジレンマがドラマになる</div>
+        <div class="creative-item">名前を知られていない職業── 「誰も自分の仕事を知らない」孤独感・誇りの葛藤を主人公の内面として使いやすい</div>
+        <div class="creative-item">放射線治療でがん患者と毎日会う── HP回復ではなくじわじわと癒すヒーラー像。患者との長期関係がドラマになる</div>
+        <div class="creative-item">夜間緊急対応── 深夜に呼び出されて「この人が助かるかどうか」の画像を撮る緊張感</div>
+        <div class="creative-item">漫画「ラジエーションハウス」で注目されたジョブ。知名度が上がりつつある今が描き時</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-series">
+      職業名鑑 Vol.1 ── ヒーラー系統<br>
+      #職業名鑑　#ヒーラー系統
+    </div>
+    <div class="footer-nav">NEXT：p.14 臨床工学技士 ▶</div>
+  </div>
+
+</div>
+</body>
+</html>

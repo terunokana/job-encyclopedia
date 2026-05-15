@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>職業名鑑 p.12 薬剤師</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Noto+Sans+JP:wght@300;400;500&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #131929;
+    --panel2: #0e1520;
+    --border: #1e2d4a;
+    --accent: #4affb4;
+    --accent2: #7b6fff;
+    --accent3: #ff6b9d;
+    --gold: #ffd166;
+    --red: #ff3355;
+    --orange: #ff7744;
+    --teal: #00e5cc;
+    --text: #c8d8f0;
+    --text-dim: #4a6a8a;
+    --white: #e8f0ff;
+    --str: #ff7744;
+    --con: #ff5533;
+    --dex: #44ddff;
+    --int: #4affb4;
+    --wis: #7b6fff;
+    --cha: #ff6b9d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 30% 30%, rgba(0,229,204,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-meta { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.2em; }
+  .page-num  { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.15em; }
+
+  .job-title-block { margin-bottom: 32px; animation: fadeUp 0.6s ease both; }
+
+  .job-system { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.2em; margin-bottom: 8px; }
+  .job-system span { color: var(--teal); }
+
+  .job-name { font-family: 'Noto Serif JP', serif; font-weight: 900; font-size: clamp(40px, 9vw, 64px); color: var(--white); letter-spacing: 0.05em; line-height: 1; margin-bottom: 12px; }
+  .job-name-en { font-family: 'DotGothic16', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.25em; margin-bottom: 20px; }
+
+  .heal-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-family: 'DotGothic16', monospace; font-size: 10px; padding: 3px 10px; letter-spacing: 0.05em; }
+  .badge-debuff  { background: rgba(74,255,180,0.08);   color: var(--accent);  border: 1px solid rgba(74,255,180,0.25); }
+  .badge-prevent { background: rgba(0,229,204,0.08);    color: var(--teal);    border: 1px solid rgba(0,229,204,0.25); }
+  .badge-buff    { background: rgba(255,209,102,0.08);  color: var(--gold);    border: 1px solid rgba(255,209,102,0.25); }
+  .badge-int     { background: rgba(74,255,180,0.05);   color: var(--int);     border: 1px solid rgba(74,255,180,0.2); }
+
+  .catch-copy {
+    background: var(--panel);
+    border-left: 3px solid var(--teal);
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text);
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .catch-copy strong { color: var(--white); }
+  .catch-copy .dim   { color: var(--text-dim); font-size: 12px; }
+
+  .status-block {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .status-header {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.25em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .status-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .stat-row { display: grid; grid-template-columns: 52px 1fr 20px; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .stat-row:last-child { margin-bottom: 0; }
+  .stat-label { font-family: 'DotGothic16', monospace; font-size: 12px; }
+  .stat-bar-wrap { height: 6px; background: rgba(255,255,255,0.04); }
+  .stat-bar { height: 100%; position: relative; }
+  .stat-bar.max { box-shadow: 0 0 8px currentColor; }
+  .stat-bar::after { content: ''; position: absolute; right: 0; top: 0; width: 1px; height: 100%; background: rgba(255,255,255,0.5); }
+  .stat-val { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--text-dim); text-align: right; }
+  .stat-note { grid-column: 2/4; font-size: 10px; color: var(--text-dim); margin-top: -6px; margin-bottom: 4px; font-style: italic; }
+  .divider-line { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* 職場別ステータス比較 */
+  .job-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.25s both;
+  }
+
+  @media(max-width:480px) { .job-type-grid { grid-template-columns: 1fr; } }
+
+  .job-type-card {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--type-color, var(--teal));
+    padding: 14px 12px;
+  }
+
+  .job-type-name {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--type-color, var(--teal));
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+
+  .job-type-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
+
+  .jts-label { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--text-dim); width: 28px; }
+  .jts-bar-wrap { flex: 1; height: 4px; background: rgba(255,255,255,0.04); }
+  .jts-bar { height: 100%; }
+
+  .job-type-desc {
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* 職業特性 */
+  .trait-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; animation: fadeUp 0.6s ease 0.3s both; }
+  .trait-box { background: var(--panel2); border: 1px solid var(--border); padding: 14px 12px; text-align: center; }
+  .trait-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+  .trait-name { font-family: 'DotGothic16', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 6px; }
+  .trait-stars { font-family: 'DotGothic16', monospace; font-size: 11px; }
+
+  .section { margin-bottom: 32px; animation: fadeUp 0.6s ease 0.4s both; }
+
+  .section-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* タイムライン */
+  .timeline { display: flex; flex-direction: column; }
+  .tl-item { display: grid; grid-template-columns: 52px 16px 1fr; gap: 0 12px; }
+  .tl-time { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--text-dim); padding: 10px 0; text-align: right; }
+  .tl-dot-col { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); margin-top: 14px; flex-shrink: 0; }
+  .tl-dot.teal   { background: var(--teal);   box-shadow: 0 0 6px var(--teal); }
+  .tl-dot.warn   { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+  .tl-dot.normal { background: var(--accent); }
+  .tl-line { flex: 1; width: 1px; background: var(--border); }
+  .tl-content { padding: 8px 0; font-size: 13px; line-height: 1.7; }
+  .tl-title { color: var(--white); font-weight: 500; margin-bottom: 2px; }
+  .tl-sub   { font-size: 11px; color: var(--text-dim); }
+  .tl-warn  { font-size: 12px; color: var(--teal); }
+
+  .real-box { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 20px; margin-bottom: 12px; }
+  .real-box-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 10px; }
+  .real-box-text { font-size: 13px; line-height: 2; color: var(--text); }
+  .real-box-text strong { color: var(--white); }
+  .real-box-text .dim { color: var(--text-dim); font-size: 12px; }
+
+  .warn-box { background: var(--panel); border: 1px solid rgba(255,119,68,0.25); border-left: 3px solid var(--orange); padding: 16px 20px; margin-bottom: 12px; }
+  .warn-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--orange); letter-spacing: 0.2em; margin-bottom: 8px; }
+  .warn-text { font-size: 12px; color: var(--text-dim); line-height: 1.8; }
+  .warn-text strong { color: var(--text); }
+
+  .path-list { display: flex; flex-direction: column; gap: 8px; }
+  .path-item { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: baseline; }
+  .path-num { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--teal); text-align: center; }
+  .path-text { font-size: 13px; line-height: 1.8; color: var(--text); }
+  .path-text .sub { font-size: 11px; color: var(--text-dim); display: block; }
+  .path-text .age { color: var(--teal); font-family: 'DotGothic16', monospace; font-size: 12px; }
+
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .data-item { background: var(--panel2); border: 1px solid var(--border); padding: 12px 16px; }
+  .data-label { font-family: 'DotGothic16', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 6px; }
+  .data-value { font-size: 14px; color: var(--white); font-weight: 500; }
+  .data-value .sub { font-size: 11px; color: var(--text-dim); font-weight: 300; }
+
+  .impact-box { background: var(--panel); border: 1px solid rgba(0,229,204,0.2); padding: 20px; }
+  .impact-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 10px; }
+  .impact-text { font-size: 13px; line-height: 2; color: var(--text); }
+
+  .related-list { display: flex; flex-direction: column; }
+  .related-item { display: flex; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(30,45,74,0.5); }
+  .related-name { font-size: 13px; color: var(--white); white-space: nowrap; }
+  .related-diff { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+  .creative-box { background: var(--panel); border: 1px solid rgba(0,229,204,0.3); padding: 20px; margin-top: 8px; }
+  .creative-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 12px; }
+  .creative-list { display: flex; flex-direction: column; gap: 8px; }
+  .creative-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; font-size: 12px; line-height: 1.7; color: var(--text-dim); }
+  .creative-item::before { content: '▸'; color: var(--teal); font-family: 'DotGothic16', monospace; }
+
+  .card-footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .footer-series { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.15em; line-height: 1.8; }
+  .footer-nav { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.1em; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <span class="page-meta">職業名鑑 Vol.1 ── ヒーラー系統 ／ コメディカル系</span>
+    <span class="page-num">p.12</span>
+  </div>
+
+  <div class="job-title-block">
+    <div class="job-system">系統：<span>癒す・助ける</span>　／　ジョブ：<span>ヒーラー（デバフ解除・予防特化型）</span></div>
+    <h1 class="job-name">薬剤師</h1>
+    <div class="job-name-en">PHARMACIST</div>
+    <div class="heal-badges">
+      <span class="badge badge-debuff">デバフ解除</span>
+      <span class="badge badge-prevent">予防</span>
+      <span class="badge badge-buff">バフがけ</span>
+      <span class="badge badge-int">INT特化</span>
+    </div>
+  </div>
+
+  <div class="catch-copy">
+    医師が処方した薬を<strong>「そのまま渡す人」ではない。</strong><br>
+    処方の間違い・飲み合わせの危険・副作用の見落とし──<br>
+    <strong>薬剤師が最後の砦として止めている</strong>ミスが、毎日無数にある。<br>
+    医師でさえ知らない薬の知識を持ち、<br>
+    時には処方に「待った」をかける唯一の職業だ。<br>
+    <span class="dim">── 「調剤は機械がやればいい」と言われ続けても、なくせない理由がそこにある。</span>
+  </div>
+
+  <div class="status-block">
+    <div class="status-header">ABILITY STATUS</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--str);">STR</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:20%; background:var(--str);"></div></div>
+      <span class="stat-val">1</span>
+    </div>
+    <div class="stat-note">力仕事はほぼゼロ。立ちっぱなしの疲労はあるが筋力は不要</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--con);">CON</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; background:var(--con);"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+    <div class="stat-note">調剤薬局は立ちっぱなし・繁忙期は休憩もままならない</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--dex);">DEX</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; background:var(--dex);"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+    <div class="stat-note">調剤・分包・注射薬の混合など。外科ほどではないが正確さが命</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--int);">INT</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--int);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">薬理学・化学・生理学・法律・相互作用の膨大な知識。精神科医と並ぶINT最高峰</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--wis);">WIS</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--wis);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">「この処方、おかしくないか？」を瞬時に判断する能力。疑義照会の質がWISに直結</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--cha);">CHA</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--cha);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">服薬指導・患者への説明・医師への「待った」をかける交渉力</div>
+
+  </div>
+
+  <!-- 職場別キャラ比較 -->
+  <div class="section">
+    <div class="section-label">JOB TYPE ── 職場でキャラが全然違う</div>
+    <div class="job-type-grid">
+
+      <div class="job-type-card" style="--type-color: var(--teal);">
+        <div class="job-type-name">調剤薬局</div>
+        <div class="job-type-stat"><span class="jts-label">INT</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:80%; background:var(--int);"></div></div></div>
+        <div class="job-type-stat"><span class="jts-label">CHA</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:100%; background:var(--cha);"></div></div></div>
+        <div class="job-type-stat"><span class="jts-label">CON</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:80%; background:var(--con);"></div></div></div>
+        <div class="job-type-desc">患者と直接向き合う。服薬指導・かかりつけ薬剤師として長期関係を築く。CHA最重要</div>
+      </div>
+
+      <div class="job-type-card" style="--type-color: var(--accent2);">
+        <div class="job-type-name">病院薬剤師</div>
+        <div class="job-type-stat"><span class="jts-label">INT</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:100%; background:var(--int);"></div></div></div>
+        <div class="job-type-stat"><span class="jts-label">WIS</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:100%; background:var(--wis);"></div></div></div>
+        <div class="job-type-stat"><span class="jts-label">DEX</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:80%; background:var(--dex);"></div></div></div>
+        <div class="job-type-desc">抗がん剤・注射薬の混合・病棟常駐。医師と並走する専門性。INT・WIS最高峰</div>
+      </div>
+
+      <div class="job-type-card" style="--type-color: var(--gold);">
+        <div class="job-type-name">ドラッグストア</div>
+        <div class="job-type-stat"><span class="jts-label">CHA</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:100%; background:var(--cha);"></div></div></div>
+        <div class="job-type-stat"><span class="jts-label">CON</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:100%; background:var(--con);"></div></div></div>
+        <div class="job-type-stat"><span class="jts-label">INT</span><div class="jts-bar-wrap"><div class="jts-bar" style="width:60%; background:var(--int);"></div></div></div>
+        <div class="job-type-desc">市販薬の相談・レジ・品出しまで。年収は高め。専門性より体力と接客力が問われる</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 職業特性 -->
+  <div class="trait-row">
+    <div class="trait-box">
+      <span class="trait-icon">🔮</span>
+      <div class="trait-name">ヒーラー度</div>
+      <div class="trait-stars" style="color:var(--teal);">████░</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">間接的・予防型</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">💀</span>
+      <div class="trait-name">精神汚染度</div>
+      <div class="trait-stars" style="color:var(--red);">██░░░</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">比較的低め</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">👁</span>
+      <div class="trait-name">秘匿度</div>
+      <div class="trait-stars" style="color:var(--text-dim);">██░░░</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">名前は知られてる</div>
+    </div>
+  </div>
+
+  <!-- 薬剤師の本当の役割 -->
+  <div class="section">
+    <div class="section-label">REAL ROLE ── 「薬を渡す人」ではない理由</div>
+    <div class="real-box" style="border-left-color: var(--teal);">
+      <div class="real-box-title" style="color:var(--teal);">▸ 疑義照会という「待った」の権限</div>
+      <div class="real-box-text">
+        処方箋の内容に疑問がある場合、<strong>薬剤師は調剤してはならない</strong>と法律で定められている。<br>
+        医師に問い合わせて確認する「疑義照会」が義務だ。<br><br>
+        実際に止められているもの：<br>
+        <span style="color:var(--text-dim); font-size:12px;">
+        ・用量が10倍になっている入力ミス<br>
+        ・アレルギーのある成分が含まれる薬の処方<br>
+        ・一緒に飲むと効果が消える・毒になる組み合わせ<br>
+        ・腎機能が低い患者に腎排泄の薬が過剰投与されている
+        </span><br>
+        <span class="dim">── 医師も人間だ。薬剤師がいなければこれらは全部そのまま患者に届く。</span>
+      </div>
+    </div>
+    <div class="real-box" style="border-left-color: var(--int); margin-top: 10px;">
+      <div class="real-box-title" style="color:var(--int);">▸ 「プレアボイド」── 副作用を未然に防ぐ活動</div>
+      <div class="real-box-text">
+        薬による有害事象を<strong>事前に回避する</strong>専門活動。<br>
+        相互作用・投与禁忌・副作用の重篤化を防ぐのが薬剤師の核心的役割。<br>
+        病院薬剤師は病棟を回り、<strong>患者の状態をリアルタイムで薬と照合し続ける</strong>。<br>
+        <span class="dim">── 「何も起きなかった」という結果が成功。見えにくいが最も重要な仕事。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1日の流れ -->
+  <div class="section">
+    <div class="section-label">DAILY FLOW ── 1日の流れ（病院薬剤師の場合）</div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <span class="tl-time">8:30</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">ミーティング・入院患者情報収集</div>
+          <div class="tl-sub">今日入院する患者の薬・アレルギー・持病を事前に把握する</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">9:30</span>
+        <div class="tl-dot-col"><div class="tl-dot teal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">入院患者との面談・持参薬確認</div>
+          <div class="tl-sub">自宅で飲んでいた薬を全部確認。入院中の薬との相互作用をチェック<br>
+          <span class="tl-warn">「この薬、続けていいですか？」の答えを出すのが薬剤師</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">13:00</span>
+        <div class="tl-dot-col"><div class="tl-dot teal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">病棟ラウンド・薬剤指導</div>
+          <div class="tl-sub">患者のベッドサイドで副作用モニタリング・服薬指導。担当医・看護師からの問い合わせ対応</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">14:00</span>
+        <div class="tl-dot-col"><div class="tl-dot teal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">注射薬チェック・疑義照会</div>
+          <div class="tl-sub">点滴・注射の処方を全件確認<br>
+          <span class="tl-warn">問題があれば医師に連絡して処方を変えてもらう。これが「待った」の現場</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">15:00</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">カンファレンス参加</div>
+          <div class="tl-sub">医師・看護師・リハビリと合同で治療方針を議論。薬の専門家として発言する</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">随時</span>
+        <div class="tl-dot-col"><div class="tl-dot warn"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">抗がん剤の無菌調製</div>
+          <div class="tl-sub">
+          <span class="tl-warn">抗がん剤は混合を間違えると患者が死ぬ。曝露防止スーツを着て無菌ブースで調製する</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- なるには -->
+  <div class="section">
+    <div class="section-label">HOW TO ── なるには？</div>
+    <div class="path-list">
+      <div class="path-item">
+        <span class="path-num">01</span>
+        <div class="path-text">
+          薬学部（6年制）卒業
+          <span class="sub"><span class="age">18歳入学 → 24歳卒業（最短）</span>。4年制は研究職・非調剤向け</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">02</span>
+        <div class="path-text">
+          薬剤師国家試験に合格
+          <span class="sub"><span class="age">24歳（最短）。</span>合格率は約70〜80%。難易度は高い</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">03</span>
+        <div class="path-text">
+          勤務先を選んでキャリアスタート
+          <span class="sub">調剤薬局・病院・ドラッグストア・製薬会社など。選択でキャラが変わる</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">04</span>
+        <div class="path-text">
+          認定薬剤師・専門薬剤師の取得（任意）
+          <span class="sub">がん・感染症・糖尿病など領域を絞ることで年収・専門性が上がる</span>
+        </div>
+      </div>
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <div class="warn-title">⚠ 「調剤は機械化される」問題</div>
+      <div class="warn-text">
+        錠剤を数えて袋に入れる作業は自動化が進んでいる。<br>
+        しかし<strong>疑義照会・服薬指導・副作用モニタリング・処方提案</strong>は機械にできない。<br>
+        薬剤師の価値は「対物業務（薬を作る）」から<strong>「対人業務（人を診る）」へシフト中。</strong><br>
+        2024年の診療報酬改定でその方向性が明確になった。
+      </div>
+    </div>
+  </div>
+
+  <!-- データ -->
+  <div class="section">
+    <div class="section-label">DATA ── 数字で見る薬剤師</div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="data-label">平均年収</div>
+        <div class="data-value">500〜700万<span class="sub">（職場・地域・役職で大きく変動）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">全国の薬剤師数</div>
+        <div class="data-value">約32万人<span class="sub">（医師の約1.5倍いる）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">最短で免許取得の年齢</div>
+        <div class="data-value">24歳<span class="sub">（6年制薬学部・現役一発合格）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">将来性</div>
+        <div class="data-value">★★★★☆<span class="sub">（対人業務にシフトできれば高い）</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 社会的影響 -->
+  <div class="section">
+    <div class="section-label">IMPACT ── この職業がないと？</div>
+    <div class="impact-box">
+      <div class="impact-title">⚠ 薬剤師がいなくなったら</div>
+      <div class="impact-text">
+        医師の処方ミス・入力ミス・飲み合わせの見落としが<strong>そのまま患者に届く</strong>。<br>
+        日本では1日に数千万枚の処方箋が発行されている。<br>
+        その全てに「最後の砦」として薬剤師が目を通している。<br>
+        薬による死亡事故・副作用の重篤化が急増するのは確実だ。<br>
+        <span style="color:var(--text-dim); font-size:12px;">── 「何も起きていない」という日常が、薬剤師の成果の証明だ。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 似てるけど違う -->
+  <div class="section">
+    <div class="section-label">SIMILAR BUT DIFFERENT ── 似てるけど違う職業</div>
+    <div class="related-list">
+      <div class="related-item">
+        <span class="related-name">登録販売者</span>
+        <span class="related-diff">市販薬の一部を販売できる資格。薬剤師より難易度は低く、調剤はできない。ドラッグストアで薬剤師の代わりに立つことも</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">臨床検査技師</span>
+        <span class="related-diff">血液や検体を分析するが処方には関わらない。薬剤師とは別の専門性で医師を支援する</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">MR（医薬情報担当者）</span>
+        <span class="related-diff">製薬会社の営業職。医師に薬の情報を提供する。薬の知識は使うが、患者に直接触れない</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">精神科医</span>
+        <span class="related-diff">向精神薬の知識は精神科医も薬剤師レベルが必要。唯一「処方する医師と薬を管理する薬剤師」の知識が重なる領域</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- オフの過ごし方 -->
+  <div class="section">
+    <div class="section-label">OFF DUTY ── 職業人のリアル</div>
+    <div class="real-box" style="border-left-color: var(--teal);">
+      <div class="real-box-title" style="color:var(--teal);">▸ 仕事以外の姿</div>
+      <div class="real-box-text">
+        医師ほどの激務ではなく、<strong>ワークライフバランスが取りやすい医療職</strong>の代表格。<br>
+        女性が多い職種で、産休・育休を取りながら長く働けるのが特徴。<br>
+        派遣薬剤師として時給制で働く人も多く、<strong>働き方の柔軟性が高い</strong>。<br><br>
+        趣味は職業的な偏りが少ない。医師や看護師のような「仕事に引っ張られるオフ」が少ない。<br>
+        <span class="dim">── 「命に直接関わる緊張感」が低めの分、精神的な余裕がある。ただし調剤ミスへのプレッシャーは常にある。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 創作設定メモ -->
+  <div class="section">
+    <div class="section-label">FOR CREATORS ── 創作設定メモ</div>
+    <div class="creative-box">
+      <div class="creative-title">▸ このキャラを主人公にするなら</div>
+      <div class="creative-list">
+        <div class="creative-item">INT最高峰なのに「医師より地位が低い」という立場のギャップ。知識では医師を超えているのに「待った」をかけるたびに軋轢が生まれる</div>
+        <div class="creative-item">「何も起きなかった」が成功の職業── 活躍しても誰にも気づかれない主人公として描きやすい</div>
+        <div class="creative-item">毒・薬の知識がMAXなので、ミステリーの犯人・探偵・共犯者として全方位で使える</div>
+        <div class="creative-item">抗がん剤の無菌調製シーン── スーツ・無菌ブース・一滴のミスが命取りという緊張感は映像映えする</div>
+        <div class="creative-item">調剤薬局の薬剤師は「街の人の全病歴・全服薬履歴」を把握している── 情報屋・相談役として物語に組み込みやすい</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-series">
+      職業名鑑 Vol.1 ── ヒーラー系統<br>
+      #職業名鑑　#ヒーラー系統
+    </div>
+    <div class="footer-nav">NEXT：p.13 診療放射線技師 ▶</div>
+  </div>
+
+</div>
+</body>
+</html>

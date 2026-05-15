@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>職業名鑑 ヒーラー系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Noto+Sans+JP:wght@300;400;500&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1628;
+    --panel: #131929;
+    --border: #1e2d4a;
+    --accent: #4affb4;
+    --accent2: #7b6fff;
+    --accent3: #ff6b9d;
+    --gold: #ffd166;
+    --text: #c8d8f0;
+    --text-dim: #5a7a9a;
+    --red: #ff4466;
+    --white: #e8f0ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── ノイズテクスチャ ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── 表紙 ─── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+  }
+
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 30%, rgba(74,255,180,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 70%, rgba(123,111,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 80%, rgba(255,107,157,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .series-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    opacity: 0.8;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  .cover-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+    animation: floatIcon 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(74,255,180,0.4));
+  }
+
+  @keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .cover-title-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(36px, 8vw, 56px);
+    color: var(--white);
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .cover-subtitle {
+    font-family: 'DotGothic16', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    margin-bottom: 48px;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+
+  .cover-divider {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 0 auto 48px;
+    animation: fadeIn 1s ease 0.6s both;
+  }
+
+  .cover-desc {
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text-dim);
+    max-width: 480px;
+    animation: fadeUp 0.8s ease 0.6s both;
+  }
+
+  .cover-desc strong {
+    color: var(--accent);
+  }
+
+  .cover-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 40px;
+    animation: fadeUp 0.8s ease 0.8s both;
+  }
+
+  .tag {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .tag.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(74,255,180,0.05);
+  }
+
+  /* ─── セクション区切り ─── */
+  .section-break {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 60px 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .section-num {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+  }
+
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--white);
+    letter-spacing: 0.05em;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ─── ステータス説明 ─── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 480px) {
+    .stat-grid { grid-template-columns: 1fr; }
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent-color, var(--accent));
+  }
+
+  .stat-card-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .stat-abbr {
+    font-family: 'DotGothic16', monospace;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--accent-color, var(--accent));
+  }
+
+  .stat-name-jp {
+    font-size: 13px;
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .stat-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .stat-example {
+    margin-top: 6px;
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    opacity: 0.7;
+  }
+
+  /* ─── 条件付きステータスセクション ─── */
+  .conditional-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .conditional-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 0.2em;
+    margin-bottom: 12px;
+  }
+
+  .conditional-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .conditional-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .cond-abbr {
+    font-family: 'DotGothic16', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+  }
+
+  .cond-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* ─── 職業特性 ─── */
+  .trait-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 480px) {
+    .trait-grid { grid-template-columns: 1fr; }
+  }
+
+  .trait-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .trait-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .trait-name {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .trait-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ─── ヒール種別 ─── */
+  .heal-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 480px) {
+    .heal-types { grid-template-columns: 1fr; }
+  }
+
+  .heal-type {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .heal-badge {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .heal-badge.hp { background: rgba(255,68,102,0.15); color: var(--red); border: 1px solid rgba(255,68,102,0.3); }
+  .heal-badge.mp { background: rgba(123,111,255,0.15); color: var(--accent2); border: 1px solid rgba(123,111,255,0.3); }
+  .heal-badge.debuff { background: rgba(74,255,180,0.1); color: var(--accent); border: 1px solid rgba(74,255,180,0.3); }
+  .heal-badge.buff { background: rgba(255,209,102,0.1); color: var(--gold); border: 1px solid rgba(255,209,102,0.3); }
+  .heal-badge.revive { background: rgba(255,107,157,0.1); color: var(--accent3); border: 1px solid rgba(255,107,157,0.3); }
+  .heal-badge.prevent { background: rgba(90,122,154,0.2); color: var(--text-dim); border: 1px solid var(--border); }
+
+  .heal-info {}
+  .heal-name {
+    font-size: 13px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .heal-example {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ─── ステータスバー サンプル ─── */
+  .sample-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-top: 24px;
+  }
+
+  .sample-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    margin-bottom: 20px;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 24px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .stat-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .stat-bar-wrap {
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-bar {
+    height: 100%;
+    background: var(--bar-color, var(--accent));
+    position: relative;
+  }
+
+  .stat-bar::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 2px;
+    height: 100%;
+    background: white;
+    opacity: 0.4;
+  }
+
+  .stat-val {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* ─── 読み方注意 ─── */
+  .notice-box {
+    border: 1px solid rgba(255,209,102,0.3);
+    background: rgba(255,209,102,0.04);
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+
+  .notice-title {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+  }
+
+  .notice-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* ─── 目次 ─── */
+  .toc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .toc-item {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(30,45,74,0.5);
+  }
+
+  .toc-num {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .toc-name {
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .toc-tag {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+  }
+
+  .toc-tag.secret { color: var(--accent); border-color: rgba(74,255,180,0.3); }
+  .toc-tag.san { color: var(--red); border-color: rgba(255,68,102,0.3); }
+  .toc-tag.str { color: var(--gold); border-color: rgba(255,209,102,0.3); }
+
+  .toc-section-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 0.2em;
+    padding: 16px 0 8px;
+  }
+
+  /* ─── アニメーション ─── */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    animation: fadeUp 0.7s ease both;
+  }
+
+  /* ─── フッター ─── */
+  .footer {
+    text-align: center;
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  .footer-text {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    line-height: 2;
+  }
+
+  .next-page {
+    display: inline-block;
+    margin-top: 20px;
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    border: 1px solid rgba(74,255,180,0.3);
+    padding: 8px 20px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     表紙
+══════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-bg"></div>
+
+  <div class="series-label">職業名鑑 Vol.1 ── Healer Class</div>
+
+  <div class="cover-icon">🏥</div>
+
+  <h1 class="cover-title-jp">ヒーラー系統</h1>
+  <div class="cover-subtitle">SHOKUGYOU MEIKAN ── HEALER</div>
+
+  <div class="cover-divider"></div>
+
+  <p class="cover-desc">
+    「医者になりたい」と言う子どもは多い。<br>
+    でも<strong>診療放射線技師</strong>を知っている子どもは、<br>
+    ほとんどいない。<br><br>
+    癒す・支える・繋ぐ。<br>
+    ヒーラーの仕事は、<strong>医師だけじゃない</strong>。
+  </p>
+
+  <div class="cover-tags">
+    <span class="tag active">#職業名鑑</span>
+    <span class="tag active">#ヒーラー系統</span>
+    <span class="tag">#進路</span>
+    <span class="tag">#創作設定</span>
+    <span class="tag">#TRPG</span>
+    <span class="tag">#キャラ設定</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ステータスの読み方
+══════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-header fade-up">
+    <span class="section-num">PAGE 00</span>
+    <h2 class="section-title">ステータスの読み方</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p style="font-size:13px; color:var(--text-dim); line-height:2; margin-bottom:32px;">
+    各職業カードには2種類の数値が載っている。<br>
+    <strong style="color:var(--white)">「能力値」</strong>はその職業に就く人に求められる資質。<br>
+    <strong style="color:var(--white)">「職業特性」</strong>はその仕事そのものが持つ性質だ。
+  </p>
+
+  <!-- 常時表示ステータス -->
+  <div style="margin-bottom:8px;">
+    <span style="font-family:'DotGothic16',monospace; font-size:10px; color:var(--accent); letter-spacing:0.2em;">ALWAYS SHOWN ── 全職業に表示</span>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card" style="--accent-color:#ff9944;">
+      <div class="stat-card-header">
+        <span class="stat-abbr" style="color:#ff9944;">STR</span>
+        <span class="stat-name-jp">筋力・体の力</span>
+      </div>
+      <p class="stat-desc">瞬発的な力仕事・重いものを扱う能力。骨を叩く、患者を抱える、長時間立ち続けるなど。</p>
+      <p class="stat-example">高い職業例：整形外科医・精神科看護師・救急救命士</p>
+    </div>
+
+    <div class="stat-card" style="--accent-color:#ff6644;">
+      <div class="stat-card-header">
+        <span class="stat-abbr" style="color:#ff6644;">CON</span>
+        <span class="stat-name-jp">耐久力・疲労耐性</span>
+      </div>
+      <p class="stat-desc">長時間労働・夜勤・体力消耗に耐え続けられるか。「倒れない」強さ。</p>
+      <p class="stat-example">高い職業例：外科医・救急医・訪問看護師</p>
+    </div>
+
+    <div class="stat-card" style="--accent-color:#44ddff;">
+      <div class="stat-card-header">
+        <span class="stat-abbr" style="color:#44ddff;">DEX</span>
+        <span class="stat-name-jp">器用さ・手先の精度</span>
+      </div>
+      <p class="stat-desc">精密な手作業・反応速度・繊細な操作能力。「速くて正確」な動き。</p>
+      <p class="stat-example">高い職業例：脳神経外科医・歯科医師・臨床工学技士</p>
+    </div>
+
+    <div class="stat-card" style="--accent-color:var(--accent);">
+      <div class="stat-card-header">
+        <span class="stat-abbr">INT</span>
+        <span class="stat-name-jp">知識・専門学力</span>
+      </div>
+      <p class="stat-desc">専門知識の深さ・記憶量・学習能力。資格試験の難易度にも直結する。</p>
+      <p class="stat-example">高い職業例：精神科医・薬剤師・臨床検査技師</p>
+    </div>
+
+    <div class="stat-card" style="--accent-color:var(--accent2);">
+      <div class="stat-card-header">
+        <span class="stat-abbr" style="color:var(--accent2);">WIS</span>
+        <span class="stat-name-jp">判断力・状況認識</span>
+      </div>
+      <p class="stat-desc">複雑な状況で素早く正しい選択をする能力。「迷ったら死ぬ」場面での頭の回転。</p>
+      <p class="stat-example">高い職業例：救急医・集中治療医・産業医</p>
+    </div>
+
+    <div class="stat-card" style="--accent-color:var(--accent3);">
+      <div class="stat-card-header">
+        <span class="stat-abbr" style="color:var(--accent3);">CHA</span>
+        <span class="stat-name-jp">交渉術・対人力</span>
+      </div>
+      <p class="stat-desc">患者・家族・チームとの信頼関係を築く力。「話す」「聴く」「動かす」能力。</p>
+      <p class="stat-example">高い職業例：精神科医・小児科医・医療ソーシャルワーカー</p>
+    </div>
+  </div>
+
+  <!-- 条件付きステータス -->
+  <div style="margin: 28px 0 8px;">
+    <span style="font-family:'DotGothic16',monospace; font-size:10px; color:var(--accent2); letter-spacing:0.2em;">CONDITIONAL ── 該当職業のみ表示</span>
+  </div>
+
+  <div class="conditional-section">
+    <div class="conditional-label">▸ 精神系ステータス</div>
+    <div class="conditional-list">
+      <div class="conditional-item">
+        <span class="cond-abbr">SAN<br><span style="font-size:9px; color:var(--text-dim)">正気耐性</span></span>
+        <span class="cond-desc">グロテスクな現場・死・異常体験に晒されても正気を保てるか。急性・強烈な体験への耐性。<br><span style="color:rgba(255,68,102,0.7)">※低い人が就くと後遺症リスクあり</span></span>
+      </div>
+      <div class="conditional-item">
+        <span class="cond-abbr" style="color:#ff9988;">MEN<br><span style="font-size:9px; color:var(--text-dim)">精神持久力</span></span>
+        <span class="cond-desc">慢性的な感情労働・燃え尽きに耐えられるか。じわじわと削られる消耗への耐性。SANとは別物。</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="conditional-section" style="border-left-color: #44ddff;">
+    <div class="conditional-label" style="color:#44ddff;">▸ 感覚系ステータス</div>
+    <div class="conditional-list">
+      <div class="conditional-item">
+        <span class="cond-abbr" style="color:#44ddff;">PER<br><span style="font-size:9px; color:var(--text-dim)">感覚精度</span></span>
+        <span class="cond-desc">視覚・聴覚・触覚・嗅覚など、感覚器の鋭さが職能に直結する職業に表示。視力だけでなく五感全体を含む。</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="conditional-section" style="border-left-color: var(--accent3);">
+    <div class="conditional-label" style="color:var(--accent3);">▸ 外見系ステータス</div>
+    <div class="conditional-list">
+      <div class="conditional-item">
+        <span class="cond-abbr" style="color:var(--accent3);">APP<br><span style="font-size:9px; color:var(--text-dim)">外見・印象</span></span>
+        <span class="cond-desc">外見が採用・信頼・職能に直結する職業のみ表示。ヒーラー系統では基本的に出現しない。</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-break">
+
+  <!-- 職業特性 -->
+  <div class="section-header">
+    <span class="section-num">──</span>
+    <h2 class="section-title" style="font-size:18px;">職業特性（仕事そのものの性質）</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="trait-grid">
+    <div class="trait-card">
+      <span class="trait-icon">🔮</span>
+      <div class="trait-name">ヒーラー度</div>
+      <div class="trait-desc">「癒す」関与度。高いほど直接的に人の苦しみに関わる。</div>
+    </div>
+    <div class="trait-card">
+      <span class="trait-icon">💀</span>
+      <div class="trait-name">精神汚染度</div>
+      <div class="trait-desc">その仕事が働く人の精神を削る強さ。高いほど覚悟が必要。</div>
+    </div>
+    <div class="trait-card">
+      <span class="trait-icon">👁</span>
+      <div class="trait-name">秘匿度</div>
+      <div class="trait-desc">世間に知られていない度合い。高いほど「存在を知らない人が多い」職業。</div>
+    </div>
+  </div>
+
+  <div class="notice-box">
+    <div class="notice-title">⚠ 精神汚染度について</div>
+    <p class="notice-text">
+      「つらい仕事 ＝ 精神汚染度が高い」ではない。<br>
+      <strong style="color:var(--white)">精神汚染度 ＝ 暴露量 ÷ 覚悟係数</strong><br><br>
+      脳神経外科医は「血を見る・命を扱う」と覚悟して入るため汚染度は低め。<br>
+      学校教師は「子どもに勉強を教える仕事」と思って入るため、<br>
+      いじめ・家庭問題・学習障害に直面した時の汚染度が高くなる。<br>
+      <span style="color:rgba(90,122,154,0.8)">── 覚悟していなかった部分で削られる。</span>
+    </p>
+  </div>
+
+  <hr class="section-break">
+
+  <!-- ヒール種別 -->
+  <div class="section-header">
+    <span class="section-num">──</span>
+    <h2 class="section-title" style="font-size:18px;">ヒール種別</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p style="font-size:12px; color:var(--text-dim); line-height:1.8; margin-bottom:20px;">
+    ヒーラー系統といっても「何を回復するか」は職業によって全く異なる。<br>
+    複数タグを持つ職業も多い。
+  </p>
+
+  <div class="heal-types">
+    <div class="heal-type">
+      <span class="heal-badge hp">HP回復</span>
+      <div class="heal-info">
+        <div class="heal-name">身体の直接治療</div>
+        <div class="heal-example">外科医・救急医・ICU看護師<br>傷を塞ぐ・止血・物理的に治す</div>
+      </div>
+    </div>
+
+    <div class="heal-type">
+      <span class="heal-badge mp">MP回復</span>
+      <div class="heal-info">
+        <div class="heal-name">精神・心の回復</div>
+        <div class="heal-example">精神科医・臨床心理士<br>「エーテル」「エスナ」タイプ</div>
+      </div>
+    </div>
+
+    <div class="heal-type">
+      <span class="heal-badge debuff">デバフ解除</span>
+      <div class="heal-info">
+        <div class="heal-name">状態異常の除去</div>
+        <div class="heal-example">薬剤師・感染症科医<br>病気・毒・依存症を取り除く</div>
+      </div>
+    </div>
+
+    <div class="heal-type">
+      <span class="heal-badge buff">バフがけ</span>
+      <div class="heal-info">
+        <div class="heal-name">機能・能力の強化支援</div>
+        <div class="heal-example">作業療法士・理学療法士<br>「できること」を増やしていく</div>
+      </div>
+    </div>
+
+    <div class="heal-type">
+      <span class="heal-badge revive">蘇生</span>
+      <div class="heal-info">
+        <div class="heal-name">生死の境界での介入</div>
+        <div class="heal-example">救急救命士・集中治療医<br>繋ぐ・戻す・諦めない</div>
+      </div>
+    </div>
+
+    <div class="heal-type">
+      <span class="heal-badge prevent">予防</span>
+      <div class="heal-info">
+        <div class="heal-name">病気・事故を起こさない</div>
+        <div class="heal-example">産業医・公衆衛生師・保健師<br>倒れる前に手を打つ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- サンプルカード -->
+  <div class="sample-card" style="margin-top:32px;">
+    <div class="sample-label">▸ SAMPLE ── カードの見方（架空の例）</div>
+
+    <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:4px;">
+      <span style="font-family:'Noto Serif JP',serif; font-size:20px; font-weight:700; color:var(--white);">○○医</span>
+      <span style="font-family:'DotGothic16',monospace; font-size:10px; color:var(--text-dim);">系統：癒す・助ける　／　ヒーラー</span>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+      <span style="font-family:'DotGothic16',monospace; font-size:10px; color:var(--accent); border:1px solid rgba(74,255,180,0.3); padding:2px 8px;">HP回復</span>
+      <span style="font-family:'DotGothic16',monospace; font-size:10px; color:var(--accent2); border:1px solid rgba(123,111,255,0.3); padding:2px 8px;">蘇生</span>
+    </div>
+
+    <div class="stat-row">
+      <span class="stat-label">STR</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; --bar-color:#ff9944;"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">CON</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%; --bar-color:#ff6644;"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">DEX</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; --bar-color:#44ddff;"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">INT</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%; --bar-color:var(--accent);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">WIS</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:100%; --bar-color:var(--accent2);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">CHA</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; --bar-color:var(--accent3);"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+
+    <div style="border-top:1px solid var(--border); margin: 16px 0; padding-top:16px;">
+      <div class="stat-row">
+        <span class="stat-label" style="color:var(--red);">SAN</span>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; --bar-color:var(--red);"></div></div>
+        <span class="stat-val">4</span>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border); margin: 16px 0; padding-top:16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+      <div style="text-align:center;">
+        <div style="font-size:18px; margin-bottom:4px;">🔮</div>
+        <div style="font-family:'DotGothic16',monospace; font-size:9px; color:var(--text-dim); margin-bottom:4px;">ヒーラー度</div>
+        <div style="font-family:'DotGothic16',monospace; font-size:12px; color:var(--accent);">████░</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:18px; margin-bottom:4px;">💀</div>
+        <div style="font-family:'DotGothic16',monospace; font-size:9px; color:var(--text-dim); margin-bottom:4px;">精神汚染度</div>
+        <div style="font-family:'DotGothic16',monospace; font-size:12px; color:var(--red);">███░░</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:18px; margin-bottom:4px;">👁</div>
+        <div style="font-family:'DotGothic16',monospace; font-size:9px; color:var(--text-dim); margin-bottom:4px;">秘匿度</div>
+        <div style="font-family:'DotGothic16',monospace; font-size:12px; color:var(--text-dim);">██░░░</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-break">
+
+  <!-- 目次 -->
+  <div class="section-header">
+    <span class="section-num">INDEX</span>
+    <h2 class="section-title">収録職業一覧</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="toc-list">
+    <div class="toc-section-label">▸ 医師系</div>
+    <div class="toc-item"><span class="toc-num">p.01</span><span class="toc-name">救急医</span><span class="toc-tag san">高SAN要求</span></div>
+    <div class="toc-item"><span class="toc-num">p.02</span><span class="toc-name">外科医（消化器）</span><span class="toc-tag str">高CON</span></div>
+    <div class="toc-item"><span class="toc-num">p.03</span><span class="toc-name">脳神経外科医</span><span class="toc-tag str">DEX特化</span></div>
+    <div class="toc-item"><span class="toc-num">p.04</span><span class="toc-name">精神科医</span><span class="toc-tag san">汚染注意</span></div>
+    <div class="toc-item"><span class="toc-num">p.05</span><span class="toc-name">小児科医</span><span class="toc-tag">高CHA</span></div>
+    <div class="toc-item"><span class="toc-num">p.06</span><span class="toc-name">緩和ケア医</span><span class="toc-tag san">汚染注意</span></div>
+    <div class="toc-item"><span class="toc-num">p.07</span><span class="toc-name">産業医</span><span class="toc-tag secret">秘匿★★★★</span></div>
+
+    <div class="toc-section-label">▸ 看護系</div>
+    <div class="toc-item"><span class="toc-num">p.08</span><span class="toc-name">救急看護師</span><span class="toc-tag san">高SAN要求</span></div>
+    <div class="toc-item"><span class="toc-num">p.09</span><span class="toc-name">精神科看護師</span><span class="toc-tag str">STR特化</span></div>
+    <div class="toc-item"><span class="toc-num">p.10</span><span class="toc-name">NICU看護師</span><span class="toc-tag san">汚染注意</span></div>
+    <div class="toc-item"><span class="toc-num">p.11</span><span class="toc-name">訪問看護師</span><span class="toc-tag secret">秘匿★★★</span></div>
+
+    <div class="toc-section-label">▸ コメディカル系（名鑑の真骨頂）</div>
+    <div class="toc-item"><span class="toc-num">p.12</span><span class="toc-name">薬剤師</span><span class="toc-tag">INT特化</span></div>
+    <div class="toc-item"><span class="toc-num">p.13</span><span class="toc-name">診療放射線技師</span><span class="toc-tag secret">秘匿★★★★★</span></div>
+    <div class="toc-item"><span class="toc-num">p.14</span><span class="toc-name">臨床工学技士</span><span class="toc-tag secret">秘匿★★★★★</span></div>
+    <div class="toc-item"><span class="toc-num">p.15</span><span class="toc-name">作業療法士</span><span class="toc-tag">バフ特化</span></div>
+    <div class="toc-item"><span class="toc-num">p.16</span><span class="toc-name">言語聴覚士</span><span class="toc-tag secret">秘匿★★★★★</span></div>
+    <div class="toc-item"><span class="toc-num">p.17</span><span class="toc-name">義肢装具士</span><span class="toc-tag secret">秘匿★★★★★</span></div>
+
+    <div class="toc-section-label">▸ メンタル系</div>
+    <div class="toc-item"><span class="toc-num">p.18</span><span class="toc-name">公認心理師</span><span class="toc-tag san">汚染注意</span></div>
+    <div class="toc-item"><span class="toc-num">p.19</span><span class="toc-name">精神保健福祉士</span><span class="toc-tag secret">秘匿★★★★</span></div>
+    <div class="toc-item"><span class="toc-num">p.20</span><span class="toc-name">カウンセラー（民間）</span><span class="toc-tag san">汚染注意</span></div>
+
+    <div class="toc-section-label">▸ 番外・更新枠</div>
+    <div class="toc-item"><span class="toc-num">p.21</span><span class="toc-name">大手病院 vs クリニックの違い</span><span class="toc-tag secret">コラム</span></div>
+    <div class="toc-item"><span class="toc-num">p.??</span><span class="toc-name">読者リクエスト職業</span><span class="toc-tag">随時更新</span></div>
+  </div>
+
+  <!-- フッター -->
+  <div class="footer">
+    <p class="footer-text">
+      職業名鑑 ── SHOKUGYOU MEIKAN<br>
+      Vol.1 Healer Class<br><br>
+      「親に同じ職業がいないと目指しづらい」をなくすために。
+    </p>
+    <span class="next-page">▶ NEXT：p.01 救急医</span>
+  </div>
+
+</div>
+</body>
+</html>

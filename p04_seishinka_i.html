@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>職業名鑑 p.04 精神科医</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Noto+Sans+JP:wght@300;400;500&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1628;
+    --panel: #131929;
+    --panel2: #0e1520;
+    --border: #1e2d4a;
+    --accent: #4affb4;
+    --accent2: #7b6fff;
+    --accent3: #ff6b9d;
+    --gold: #ffd166;
+    --red: #ff3355;
+    --orange: #ff7744;
+    --purple: #b388ff;
+    --text: #c8d8f0;
+    --text-dim: #4a6a8a;
+    --white: #e8f0ff;
+    --str: #ff7744;
+    --con: #ff5533;
+    --dex: #44ddff;
+    --int: #4affb4;
+    --wis: #7b6fff;
+    --cha: #ff6b9d;
+    --san: #ff3355;
+    --men: #ff9988;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* 精神科らしい微妙な揺らぎのある背景グラデーション */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 20%, rgba(123,111,255,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 70% at 80% 80%, rgba(179,136,255,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-meta {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+  }
+
+  .page-num {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 0.15em;
+  }
+
+  .job-title-block {
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .job-system {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+
+  .job-system span { color: var(--accent2); }
+
+  .job-name {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(40px, 9vw, 64px);
+    color: var(--white);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .job-name-en {
+    font-family: 'DotGothic16', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.25em;
+    margin-bottom: 20px;
+  }
+
+  .heal-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-mp     { background: rgba(123,111,255,0.12); color: var(--accent2);  border: 1px solid rgba(123,111,255,0.35); }
+  .badge-debuff { background: rgba(74,255,180,0.08);  color: var(--accent);   border: 1px solid rgba(74,255,180,0.25); }
+  .badge-buff   { background: rgba(255,209,102,0.08); color: var(--gold);     border: 1px solid rgba(255,209,102,0.25); }
+  .badge-san    { background: rgba(255,51,85,0.08);   color: #ff6688;         border: 1px solid rgba(255,51,85,0.2); }
+  .badge-warn   { background: rgba(255,119,68,0.08);  color: var(--orange);   border: 1px solid rgba(255,119,68,0.25); }
+
+  .catch-copy {
+    background: var(--panel);
+    border-left: 3px solid var(--accent2);
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text);
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .catch-copy strong { color: var(--white); }
+  .catch-copy .dim { color: var(--text-dim); font-size: 12px; }
+
+  /* ステータスブロック */
+  .status-block {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .status-header {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.25em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: 52px 1fr 20px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .stat-row:last-child { margin-bottom: 0; }
+
+  .stat-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 12px;
+  }
+
+  .stat-bar-wrap {
+    height: 6px;
+    background: rgba(255,255,255,0.04);
+    position: relative;
+  }
+
+  .stat-bar {
+    height: 100%;
+    position: relative;
+  }
+
+  .stat-bar.max { box-shadow: 0 0 8px currentColor; }
+
+  .stat-bar::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0;
+    width: 1px; height: 100%;
+    background: rgba(255,255,255,0.5);
+  }
+
+  .stat-val {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  .stat-note {
+    grid-column: 2 / 4;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: -6px;
+    margin-bottom: 4px;
+    padding-left: 2px;
+    font-style: italic;
+  }
+
+  .divider-line {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 16px 0;
+  }
+
+  /* 対比ボックス（STR vs CHA） */
+  .contrast-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0;
+  }
+
+  .contrast-col { padding: 0 16px; }
+  .contrast-col:first-child { padding-left: 0; }
+  .contrast-col:last-child { padding-right: 0; }
+  .contrast-divider { background: var(--border); }
+
+  .contrast-title {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+
+  .contrast-text {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* 職業特性 */
+  .trait-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .trait-box {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .trait-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+  .trait-name {
+    font-family: 'DotGothic16', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .trait-stars { font-family: 'DotGothic16', monospace; font-size: 11px; }
+
+  /* セクション共通 */
+  .section {
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  .section-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* タイムライン */
+  .timeline { display: flex; flex-direction: column; }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: 52px 16px 1fr;
+    gap: 0 12px;
+  }
+
+  .tl-time {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 10px 0;
+    text-align: right;
+  }
+
+  .tl-dot-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .tl-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    margin-top: 14px;
+    flex-shrink: 0;
+  }
+
+  .tl-dot.purple { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+  .tl-dot.warn   { background: var(--orange);  box-shadow: 0 0 6px var(--orange); }
+  .tl-dot.normal { background: var(--accent); }
+
+  .tl-line { flex: 1; width: 1px; background: var(--border); }
+
+  .tl-content {
+    padding: 8px 0;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .tl-title { color: var(--white); font-weight: 500; margin-bottom: 2px; }
+  .tl-sub   { font-size: 11px; color: var(--text-dim); }
+  .tl-warn  { font-size: 12px; color: var(--orange); }
+
+  /* リアルボックス */
+  .real-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .real-box-title {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+  }
+
+  .real-box-text {
+    font-size: 13px;
+    line-height: 2;
+    color: var(--text);
+  }
+
+  .real-box-text strong { color: var(--white); }
+  .real-box-text .dim { color: var(--text-dim); font-size: 12px; }
+
+  /* 警告ボックス */
+  .warn-box {
+    background: var(--panel);
+    border: 1px solid rgba(255,119,68,0.25);
+    border-left: 3px solid var(--orange);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+
+  .warn-title {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--orange);
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+
+  .warn-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .warn-text strong { color: var(--text); }
+
+  /* パスリスト */
+  .path-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .path-item {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 10px;
+    align-items: baseline;
+  }
+
+  .path-num {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    text-align: center;
+  }
+
+  .path-text { font-size: 13px; line-height: 1.8; color: var(--text); }
+  .path-text .sub { font-size: 11px; color: var(--text-dim); display: block; }
+  .path-text .age { color: var(--accent2); font-family: 'DotGothic16', monospace; font-size: 12px; }
+
+  /* データグリッド */
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .data-item {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+
+  .data-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+
+  .data-value {
+    font-size: 14px;
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .data-value .sub { font-size: 11px; color: var(--text-dim); font-weight: 300; }
+
+  /* 社会的影響 */
+  .impact-box {
+    background: var(--panel);
+    border: 1px solid rgba(123,111,255,0.2);
+    padding: 20px;
+  }
+
+  .impact-title {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+  }
+
+  .impact-text {
+    font-size: 13px;
+    line-height: 2;
+    color: var(--text);
+  }
+
+  /* 関連職業 */
+  .related-list { display: flex; flex-direction: column; }
+
+  .related-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(30,45,74,0.5);
+  }
+
+  .related-name { font-size: 13px; color: var(--white); white-space: nowrap; }
+  .related-diff { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+  /* 創作メモ */
+  .creative-box {
+    background: var(--panel);
+    border: 1px solid rgba(123,111,255,0.3);
+    padding: 20px;
+    margin-top: 8px;
+  }
+
+  .creative-title {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 0.2em;
+    margin-bottom: 12px;
+  }
+
+  .creative-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .creative-item {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+
+  .creative-item::before {
+    content: '▸';
+    color: var(--accent2);
+    font-family: 'DotGothic16', monospace;
+  }
+
+  /* フッター */
+  .card-footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-series {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    line-height: 1.8;
+  }
+
+  .footer-nav {
+    font-family: 'DotGothic16', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ページヘッダー -->
+  <div class="page-header">
+    <span class="page-meta">職業名鑑 Vol.1 ── ヒーラー系統 ／ 医師系</span>
+    <span class="page-num">p.04</span>
+  </div>
+
+  <!-- 職業タイトル -->
+  <div class="job-title-block">
+    <div class="job-system">系統：<span>癒す・助ける</span>　／　ジョブ：<span>ヒーラー（MP回復・デバフ解除特化型）</span></div>
+    <h1 class="job-name">精神科医</h1>
+    <div class="job-name-en">PSYCHIATRIST</div>
+    <div class="heal-badges">
+      <span class="badge badge-mp">MP回復</span>
+      <span class="badge badge-debuff">デバフ解除</span>
+      <span class="badge badge-buff">バフがけ</span>
+      <span class="badge badge-san">精神汚染度：高</span>
+      <span class="badge badge-warn">最短29歳〜</span>
+    </div>
+  </div>
+
+  <!-- 一言説明 -->
+  <div class="catch-copy">
+    <strong>精神科医はHPを直接回復しない。</strong><br>
+    回復するのは<strong>MP・状態異常・バフの喪失</strong>だ。<br>
+    他の科で「原因不明」と言われ続けた患者が<strong>最後にたどり着く場所</strong>でもある。<br>
+    だから知識は広く深く、薬の理解は薬剤師と並ぶほど必要になる。<br>
+    <strong>ゆっくりと静かに歩く</strong>のは、演技でも性格でもない。<br>
+    <span class="dim">── 患者の「速度」に合わせないと、扉は開かない。</span>
+  </div>
+
+  <!-- ステータス -->
+  <div class="status-block">
+    <div class="status-header">ABILITY STATUS</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--str);">STR</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:20%; background:var(--str);"></div></div>
+      <span class="stat-val">1</span>
+    </div>
+    <div class="stat-note">身体的な力仕事はほぼゼロ。座って話すのが仕事</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--con);">CON</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:40%; background:var(--con);"></div></div>
+      <span class="stat-val">2</span>
+    </div>
+    <div class="stat-note">外科・救急より身体消耗は少ない。ただし脳は常にフル稼働</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--dex);">DEX</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:20%; background:var(--dex);"></div></div>
+      <span class="stat-val">1</span>
+    </div>
+    <div class="stat-note">手先の器用さはほぼ不要。処置より対話が武器</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--int);">INT</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--int);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">精神医学・神経学・内科・薬理学・心理学・法律まで。全科で最広範な学力が必要</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--wis);">WIS</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--wis);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">「この症状、本当に精神科か？」を見抜く判断力。見逃すと患者が死ぬ</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--cha);">CHA</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--cha);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">「信頼してもらえるか」が治療の成否を決める。CHAが低い精神科医は機能しない</div>
+
+    <hr class="divider-line">
+
+    <div class="status-header">CONDITIONAL STATUS</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--san);">SAN</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--san);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">患者の妄想・絶望・攻撃性に日常的に触れる。慣れても「流れ込む」ものは防げない</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--men);">MEN</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--men);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">慢性的な感情消耗。1人の患者と何年も向き合い続ける持久戦</div>
+  </div>
+
+  <!-- STR vs CHA 対比 -->
+  <div class="contrast-box" style="animation: fadeUp 0.6s ease 0.25s both;">
+    <div class="contrast-col">
+      <div class="contrast-title" style="color:var(--str);">精神科医のSTR＝1</div>
+      <div class="contrast-text">ひょろっとした体型が多い理由。<br>力仕事が一切ない。<br>むしろ「威圧感のなさ」が武器になる。</div>
+    </div>
+    <div class="contrast-divider"></div>
+    <div class="contrast-col">
+      <div class="contrast-title" style="color:var(--cha);">精神科看護師のSTR＝5</div>
+      <div class="contrast-text">同じ科でも真逆。<br>興奮した患者の身体拘束・隔離対応。<br>ムキムキになる理由がある。</div>
+    </div>
+  </div>
+
+  <!-- 職業特性 -->
+  <div class="trait-row">
+    <div class="trait-box">
+      <span class="trait-icon">🔮</span>
+      <div class="trait-name">ヒーラー度</div>
+      <div class="trait-stars" style="color:var(--accent2);">█████</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">MP特化・直接的</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">💀</span>
+      <div class="trait-name">精神汚染度</div>
+      <div class="trait-stars" style="color:var(--red);">████░</div>
+      <div style="font-size:10px; color:var(--red); margin-top:4px;">全職業でも上位</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">👁</span>
+      <div class="trait-name">秘匿度</div>
+      <div class="trait-stars" style="color:var(--text-dim);">██░░░</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">名前は知られてる</div>
+    </div>
+  </div>
+
+  <!-- 精神汚染度の説明 -->
+  <div class="section">
+    <div class="section-label">CONTAMINATION ── 精神汚染度が高い理由</div>
+
+    <div class="real-box" style="border-left-color: var(--red);">
+      <div class="real-box-title" style="color:var(--red);">💀 なぜ精神科医は削られるのか</div>
+      <div class="real-box-text">
+        外科医は「血を見る」と覚悟して入るためSAN消耗は低め。<br>
+        しかし精神科医が受け取るのは<strong>「言葉にされた絶望・妄想・攻撃性」</strong>だ。<br>
+        これは遮断できない。聴かなければ診療にならない。<br><br>
+        さらに<strong>「自分のMPが0になっている精神科医」</strong>は珍しくない。<br>
+        患者のMPを回復させる医師が、自分のMPを補充する手段を持たないという皮肉。<br>
+        <span class="dim">── 燃え尽き症候群の発生率が医師の中で最も高い科の一つ。</span>
+      </div>
+    </div>
+
+    <!-- 物理リスク -->
+    <div class="warn-box" style="margin-top:10px;">
+      <div class="warn-title">⚠ 見落とされがちな物理的リスク</div>
+      <div class="warn-text">
+        救急医がグロ・死でSANを削られるのに対し、精神科医は<strong>「人間性の崩壊」</strong>で削られる。<br>
+        さっきまで穏やかに話していた患者が、突然激昂して殴りかかってくる。<br>
+        自傷行為を目の前で始める。この<strong>「予測不能な暴力性」</strong>は医学ではなく危機管理の領域だ。<br><br>
+        医師のSTR＝1でも機能できるのは、<br>
+        「物理的に崩壊した瞬間にSTR＝5の看護師を呼ぶ判断（WIS）」があるから。<br>
+        <strong>WISが自分の生存に直結する唯一の医師職。</strong>
+      </div>
+    </div>
+
+    <!-- 逆転移 -->
+    <div style="background:rgba(123,111,255,0.06); border:1px solid rgba(123,111,255,0.25); border-left:3px solid var(--accent2); padding:20px; margin-top:10px;">
+      <div style="font-family:'DotGothic16',monospace; font-size:10px; color:var(--accent2); letter-spacing:0.2em; margin-bottom:12px;">🔮 特記事項：逆転移（Counter-transference）</div>
+      <div style="font-size:13px; line-height:2; color:var(--text);">
+        患者の感情が医師に<strong>逆方向に流れ込む</strong>現象。<br>
+        通常は「患者→医師への信頼（転移）」だが、<br>
+        逆転移は「医師→患者への過度な感情」として発生する。<br><br>
+        <div style="background:rgba(0,0,0,0.2); padding:12px 16px; margin:8px 0; font-size:12px; color:var(--text-dim); line-height:1.9;">
+          状態異常：<span style="color:var(--accent3);">魅了</span>　── 患者に過度な愛情・救済欲が生まれる<br>
+          状態異常：<span style="color:var(--red);">激怒</span>　── 患者への根拠のない嫌悪・怒りが湧く<br>
+          状態異常：<span style="color:var(--accent2);">錯乱</span>　── 「治したいのか、理解したいのか、支配したいのか」が自分でわからなくなる
+        </div>
+        <strong>これを「治療の道具として客観視」できればプロ。</strong><br>
+        飲み込まれた瞬間に医師自身が「患者化」する。<br><br>
+        <span style="color:rgba(255,107,157,0.8); font-size:12px;">
+          ── CHAが高すぎる医師ほど発生リスクが上がる。<br>
+          　　「感受性の高い優しい人」が精神科医になると最も危険な理由がここにある。<br>
+          　　「ミイラ取りがミイラになる」発生率、全ジョブ中最高。
+        </span>
+      </div>
+      <div style="border-top:1px solid rgba(123,111,255,0.2); margin-top:14px; padding-top:12px;">
+        <div style="font-family:'DotGothic16',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.15em; margin-bottom:6px;">▸ 解除方法</div>
+        <div style="font-size:12px; color:var(--text-dim); line-height:1.8;">
+          スーパービジョン（指導医による定期的な精神的点検）<br>
+          自身へのカウンセリング・分析<br>
+          <span style="color:rgba(123,111,255,0.7);">── これを怠った精神科医から順番に倒れる。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 司法精神医学 -->
+    <div style="background:rgba(255,51,85,0.04); border:1px solid rgba(255,51,85,0.15); border-left:3px solid rgba(255,51,85,0.5); padding:20px; margin-top:10px;">
+      <div style="font-family:'DotGothic16',monospace; font-size:10px; color:rgba(255,51,85,0.8); letter-spacing:0.2em; margin-bottom:10px;">⚖ 裏面設定：司法精神医学という領域</div>
+      <div style="font-size:13px; line-height:2; color:var(--text);">
+        精神科医は<strong>「法と医学の境界線」</strong>に立つ唯一の医師だ。<br><br>
+        <strong>精神鑑定：</strong>重大犯罪を犯した者の「責任能力」を診断する。<br>
+        心神喪失だったかどうかを医師が判定し、それが司法の判断に直結する。<br><br>
+        <strong>医療観察法病棟：</strong>罪を犯した精神障害者と長期間向き合う。<br>
+        「反省しているフリをしている」可能性を常に検討しながら診る。<br><br>
+        <span style="color:rgba(255,51,85,0.7); font-size:12px;">
+          救いたい対象が「悪意・嘘・演技」を武器にしているとき、<br>
+          ヒーラーとしての自己同一性が最も揺らぐ。<br>
+          この領域での精神汚染度：<span style="font-family:'DotGothic16',monospace;">█████</span>（MAX）
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 1日の流れ -->
+  <div class="section">
+    <div class="section-label">DAILY FLOW ── 1日の流れ（外来クリニックの場合）</div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <span class="tl-time">8:30</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">カルテ確認・準備</div>
+          <div class="tl-sub">今日来る患者の前回記録を読む。「前回から何が変わったか」を予測する</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">9:00</span>
+        <div class="tl-dot-col"><div class="tl-dot purple"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">外来診察スタート（1人10〜15分）</div>
+          <div class="tl-sub">午前中に10〜15人。話を聴き、状態を評価し、薬を調整する<br>
+          <span class="tl-warn">「10分で何がわかるのか」── それが精神科医の技術の核心</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">随時</span>
+        <div class="tl-dot-col"><div class="tl-dot warn"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">「原因不明」患者の紹介受診</div>
+          <div class="tl-sub">内科・神経内科・消化器科…どこに行っても異常なし。<br>
+          <span class="tl-warn">精神科が「最後の窓口」になるケースが多い。ここからが本当の診断の始まり</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">12:00</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">昼休み・書類仕事</div>
+          <div class="tl-sub">診断書・意見書・障害年金の書類。書類量が多い科の一つ</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">14:00</span>
+        <div class="tl-dot-col"><div class="tl-dot purple"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">午後外来・長期フォロー患者</div>
+          <div class="tl-sub">何年も通い続ける患者との継続診察。関係性の積み上げが治療そのもの</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">17:00</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">終業・自己回復タイム</div>
+          <div class="tl-sub">受け取ったものを「置いて帰る」作業が必要。できない医師が燃え尽きる</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">深夜</span>
+        <div class="tl-dot-col"><div class="tl-dot warn"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">（大病院では）緊急入院・措置入院対応</div>
+          <div class="tl-sub">
+          <span class="tl-warn">自傷・他害リスクのある患者を強制入院させる「精神保健指定医」の権限が発動する夜</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 知識の広さについて -->
+  <div class="section">
+    <div class="section-label">KNOWLEDGE ── なぜINTが全科最高クラスか</div>
+    <div class="real-box" style="border-left-color: var(--int);">
+      <div class="real-box-title" style="color:var(--int);">▸ 精神科医が必要な知識の範囲</div>
+      <div class="real-box-text">
+        <strong>精神医学・神経学</strong>── 脳の病気と心の病気の境界を見極める<br>
+        <strong>内科全般</strong>── 甲状腺・ステロイド・感染症が「精神症状」を出すことがある<br>
+        <strong>薬理学</strong>── 向精神薬の種類・副作用・相互作用の知識は薬剤師レベルが必要<br>
+        <strong>心理学・精神療法</strong>── 認知行動療法・精神分析・家族療法<br>
+        <strong>法律・制度</strong>── 精神保健福祉法・障害年金・強制入院の要件<br>
+        <strong>社会福祉</strong>── 生活保護・就労支援・社会復帰の制度<br>
+        <span class="dim">── 「他で原因不明」の患者が来るため、全科の知識が鑑別診断に必要になる。</span>
+      </div>
+    </div>
+    <div class="warn-box">
+      <div class="warn-title">⚠ 薬の知識について特記</div>
+      <div class="warn-text">
+        向精神薬は<strong>効果が出るまでに数週間〜数ヶ月かかる</strong>ものが多い。<br>
+        「効いてない」と自己判断して勝手にやめると離脱症状が出る薬もある。<br>
+        精神科医はこの「時間軸の管理」と「患者が続けられる処方設計」を同時にやっている。<br>
+        <strong>薬の知識量は全科でトップクラス。</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- なるには -->
+  <div class="section">
+    <div class="section-label">HOW TO ── なるには？（年齢付き）</div>
+    <div class="path-list">
+      <div class="path-item">
+        <span class="path-num">01</span>
+        <div class="path-text">
+          医学部（6年）卒業・医師国家試験合格
+          <span class="sub"><span class="age">18歳入学 → 24歳免許取得（最短）</span></span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">02</span>
+        <div class="path-text">
+          初期臨床研修（2年）で全科を経験
+          <span class="sub"><span class="age">24〜26歳。</span>ここで精神科の向き不向きを確認</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">03</span>
+        <div class="path-text">
+          後期研修で精神科を選択（3年以上）
+          <span class="sub"><span class="age">26〜29歳。</span>指定研修施設での症例経験が必須</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">04</span>
+        <div class="path-text">
+          精神科専門医試験に合格
+          <span class="sub"><span class="age">最短29歳。</span>ただしこれは「端くれ」。本当の意味で一人前は35歳前後とも言われる</span>
+        </div>
+      </div>
+      <div class="path-item">
+        <span class="path-num">05</span>
+        <div class="path-text">
+          精神保健指定医の取得（任意・5年目以降）
+          <span class="sub">強制入院の判断ができる法的権限。病院勤務では実質必須</span>
+        </div>
+      </div>
+    </div>
+    <div class="warn-box" style="margin-top:12px;">
+      <div class="warn-title">⚠ 「精神科医」を名乗る資格に要注意</div>
+      <div class="warn-text">
+        医師免許さえあれば、専門研修なしに<strong>誰でも「精神科医」と自称できる。</strong><br>
+        最近のオンライン診療には、専門医資格のない医師が「精神科医」を名乗るケースも増加。<br>
+        <strong>「精神科専門医」かどうかの確認が重要。</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- データ -->
+  <div class="section">
+    <div class="section-label">DATA ── 数字で見る精神科医</div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="data-label">平均年収</div>
+        <div class="data-value">1,000〜1,500万<span class="sub">（開業医はさらに高め）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">精神科専門医数</div>
+        <div class="data-value">約5,000人<span class="sub">（学会会員約2万人のうち）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">最短で専門医になれる年齢</div>
+        <div class="data-value">29歳<span class="sub">（18歳入学・現役一発合格の場合）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">将来性</div>
+        <div class="data-value">★★★★★<span class="sub">（精神疾患は増加の一途）</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 社会的影響 -->
+  <div class="section">
+    <div class="section-label">IMPACT ── この職業がないと？</div>
+    <div class="impact-box">
+      <div class="impact-title">⚠ 精神科医がいなくなったら</div>
+      <div class="impact-text">
+        うつ病・統合失調症・双極性障害の患者が診断も治療も受けられなくなる。<br>
+        日本では<strong>約400万人</strong>が何らかの精神疾患で通院している。<br>
+        適切な治療がなければ、就労不能・家族崩壊・自殺につながる。<br>
+        精神科医は「見えない病気」を可視化して社会に戻す機能を担っている。<br>
+        <span style="color:var(--text-dim); font-size:12px;">── 「心の問題」を個人の意志の問題として片付けてきた社会が、ようやく医療化し始めた領域。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 似てるけど違う -->
+  <div class="section">
+    <div class="section-label">SIMILAR BUT DIFFERENT ── 似てるけど違う職業</div>
+    <div class="related-list">
+      <div class="related-item">
+        <span class="related-name">心療内科医</span>
+        <span class="related-diff">精神症状が「身体症状」として出るケースを担当。過敏性腸症候群・自律神経失調症など。精神科より「軽め」のイメージだが実際は重複が多い</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">公認心理師</span>
+        <span class="related-diff">薬を処方できない。対話・心理検査が主な手段。精神科医と連携して動くことが多い</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">精神科看護師</span>
+        <span class="related-diff">同じ科でもSTRがMAXになる。「話す人」と「抑える人」で全く別の職種</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">精神保健福祉士</span>
+        <span class="related-diff">医療ではなく「社会復帰の橋渡し」が仕事。就労・住居・制度の調整役</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- オフの過ごし方 -->
+  <div class="section">
+    <div class="section-label">OFF DUTY ── 職業人のリアル</div>
+    <div class="real-box" style="border-left-color: var(--accent2);">
+      <div class="real-box-title" style="color:var(--accent2);">▸ 仕事以外の姿</div>
+      <div class="real-box-text">
+        歩き方・話し方・全体のペースがゆっくりな人が多い。<br>
+        これは性格ではなく<strong>職業的に身についた「速度調整」</strong>だ。<br>
+        患者の速度に合わせ続けた結果、自分のデフォルト速度が変わる。<br><br>
+        趣味は読書・音楽・静的なものに偏る傾向。<br>
+        整形外科医がジムに行くのと対照的に、<br>
+        <strong>「何も受け取らなくていい時間」に強く引き寄せられる。</strong><br>
+        <span class="dim">── 「話を聴く仕事」の人は、オフに「話を聴かなくていい環境」を必死に守る。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 創作設定メモ -->
+  <div class="section">
+    <div class="section-label">FOR CREATORS ── 創作設定メモ</div>
+    <div class="creative-box">
+      <div class="creative-title">▸ このキャラを主人公にするなら</div>
+      <div class="creative-list">
+        <div class="creative-item">INT・WIS・CHAがMAXなのにSTRが最低── 「頭脳型最強キャラ」の典型。物理的な危機に弱い設定が活きる</div>
+        <div class="creative-item">「患者のMPを回復させる医師が、自分のMPが0になっていく」という構造的な皮肉がそのままドラマになる</div>
+        <div class="creative-item">精神汚染度が高いため、特定の患者の言葉だけSAN値が削られる「弱点」を持たせやすい</div>
+        <div class="creative-item">「10分で何を見抜くか」── 診察シーンに緊張感を持たせやすい職業</div>
+        <div class="creative-item">「精神科医を名乗る偽者」という悪役が成立する唯一の医師職。資格確認の抜け穴がリアルに存在する</div>
+        <div class="creative-item">29歳で専門医になっても「一人前」ではない── 若い精神科医の葛藤や失敗を描きやすい</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フッター -->
+  <div class="card-footer">
+    <div class="footer-series">
+      職業名鑑 Vol.1 ── ヒーラー系統<br>
+      #職業名鑑　#ヒーラー系統
+    </div>
+    <div class="footer-nav">NEXT：p.05 小児科医 ▶</div>
+  </div>
+
+</div>
+</body>
+</html>

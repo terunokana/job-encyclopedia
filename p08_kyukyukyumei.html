@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>職業名鑑 救急救命士</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Noto+Sans+JP:wght@300;400;500&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #131929;
+    --panel2: #0e1520;
+    --border: #1e2d4a;
+    --accent: #4affb4;
+    --accent2: #7b6fff;
+    --accent3: #ff6b9d;
+    --gold: #ffd166;
+    --red: #ff3355;
+    --orange: #ff7744;
+    --siren: #ff4400;
+    --siren2: #0088ff;
+    --text: #c8d8f0;
+    --text-dim: #4a6a8a;
+    --white: #e8f0ff;
+    --str: #ff7744;
+    --con: #ff5533;
+    --dex: #44ddff;
+    --int: #4affb4;
+    --wis: #7b6fff;
+    --cha: #ff6b9d;
+    --san: #ff3355;
+    --men: #ff9988;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 30% at 20% 20%, rgba(255,68,0,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 80% 70%, rgba(0,136,255,0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-meta { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.2em; }
+  .page-num  { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--siren); letter-spacing: 0.15em; }
+
+  .job-title-block { margin-bottom: 32px; animation: fadeUp 0.6s ease both; }
+
+  .job-system { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.2em; margin-bottom: 8px; }
+  .job-system span { color: var(--siren); }
+
+  .job-name {
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 900;
+    font-size: clamp(36px, 8vw, 58px);
+    color: var(--white);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .job-name-en { font-family: 'DotGothic16', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.25em; margin-bottom: 20px; }
+
+  .heal-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge { font-family: 'DotGothic16', monospace; font-size: 10px; padding: 3px 10px; letter-spacing: 0.05em; }
+  .badge-revive  { background: rgba(255,68,0,0.12);   color: var(--siren);  border: 1px solid rgba(255,68,0,0.35); }
+  .badge-hp      { background: rgba(255,51,85,0.10);  color: var(--red);    border: 1px solid rgba(255,51,85,0.3); }
+  .badge-san     { background: rgba(255,51,85,0.08);  color: #ff6688;       border: 1px solid rgba(255,51,85,0.2); }
+  .badge-str     { background: rgba(255,119,68,0.08); color: var(--orange); border: 1px solid rgba(255,119,68,0.25); }
+  .badge-cross   { background: rgba(0,136,255,0.08);  color: var(--siren2); border: 1px solid rgba(0,136,255,0.25); }
+
+  .catch-copy {
+    background: var(--panel);
+    border-left: 3px solid var(--siren);
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text);
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .catch-copy strong { color: var(--white); }
+  .catch-copy .dim   { color: var(--text-dim); font-size: 12px; }
+
+  /* まず最初に知っておくべき分類 */
+  .classification-box {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 20px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.15s both;
+  }
+
+  .cls-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 16px; }
+
+  .cls-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media(max-width:480px){ .cls-grid { grid-template-columns: 1fr; } }
+
+  .cls-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--cls-color, var(--border));
+    padding: 12px;
+  }
+
+  .cls-name { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--cls-color, var(--text-dim)); margin-bottom: 6px; }
+  .cls-desc { font-size: 11px; color: var(--text-dim); line-height: 1.7; }
+  .cls-key  { font-size: 10px; color: var(--text-dim); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+  .cls-key span { color: var(--cls-color, var(--text-dim)); }
+
+  .status-block {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .status-header {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.25em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .status-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .stat-row { display: grid; grid-template-columns: 52px 1fr 20px; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .stat-row:last-child { margin-bottom: 0; }
+  .stat-label { font-family: 'DotGothic16', monospace; font-size: 12px; }
+  .stat-bar-wrap { height: 6px; background: rgba(255,255,255,0.04); }
+  .stat-bar { height: 100%; position: relative; }
+  .stat-bar.max { box-shadow: 0 0 8px currentColor; }
+  .stat-bar::after { content: ''; position: absolute; right: 0; top: 0; width: 1px; height: 100%; background: rgba(255,255,255,0.5); }
+  .stat-val { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--text-dim); text-align: right; }
+  .stat-note { grid-column: 2/4; font-size: 10px; color: var(--text-dim); margin-top: -6px; margin-bottom: 4px; font-style: italic; }
+  .divider-line { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  .trait-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; animation: fadeUp 0.6s ease 0.3s both; }
+  .trait-box { background: var(--panel2); border: 1px solid var(--border); padding: 14px 12px; text-align: center; }
+  .trait-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+  .trait-name { font-family: 'DotGothic16', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 6px; }
+  .trait-stars { font-family: 'DotGothic16', monospace; font-size: 11px; }
+
+  .section { margin-bottom: 32px; animation: fadeUp 0.6s ease 0.4s both; }
+
+  .section-label {
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* 隊の3名体制 */
+  .team-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media(max-width:480px){ .team-grid { grid-template-columns: 1fr; } }
+
+  .team-card {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    padding: 14px 12px;
+  }
+
+  .team-role { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--siren); margin-bottom: 6px; }
+  .team-name { font-size: 14px; color: var(--white); font-weight: 500; margin-bottom: 8px; }
+  .team-desc { font-size: 11px; color: var(--text-dim); line-height: 1.7; }
+  .team-stat { font-family: 'DotGothic16', monospace; font-size: 10px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); color: var(--text-dim); }
+
+  /* タイムライン */
+  .timeline { display: flex; flex-direction: column; }
+  .tl-item { display: grid; grid-template-columns: 52px 16px 1fr; gap: 0 12px; }
+  .tl-time { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--text-dim); padding: 10px 0; text-align: right; }
+  .tl-dot-col { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); margin-top: 14px; flex-shrink: 0; }
+  .tl-dot.siren  { background: var(--siren);  box-shadow: 0 0 8px var(--siren); }
+  .tl-dot.warn   { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+  .tl-dot.normal { background: var(--accent); }
+  .tl-line { flex: 1; width: 1px; background: var(--border); }
+  .tl-content { padding: 8px 0; font-size: 13px; line-height: 1.7; }
+  .tl-title { color: var(--white); font-weight: 500; margin-bottom: 2px; }
+  .tl-sub  { font-size: 11px; color: var(--text-dim); }
+  .tl-alert { font-size: 12px; color: var(--siren); }
+
+  .real-box { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 20px; margin-bottom: 12px; }
+  .real-box-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 10px; }
+  .real-box-text { font-size: 13px; line-height: 2; color: var(--text); }
+  .real-box-text strong { color: var(--white); }
+  .real-box-text .dim { color: var(--text-dim); font-size: 12px; }
+
+  .warn-box { background: var(--panel); border: 1px solid rgba(255,119,68,0.25); border-left: 3px solid var(--orange); padding: 16px 20px; margin-bottom: 12px; }
+  .warn-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--orange); letter-spacing: 0.2em; margin-bottom: 8px; }
+  .warn-text { font-size: 12px; color: var(--text-dim); line-height: 1.8; }
+  .warn-text strong { color: var(--text); }
+
+  /* なるにはルート */
+  .route-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  @media(max-width:480px){ .route-grid { grid-template-columns: 1fr; } }
+
+  .route-card {
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--route-color, var(--border));
+    padding: 16px;
+  }
+
+  .route-label { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--route-color, var(--text-dim)); letter-spacing: 0.15em; margin-bottom: 10px; }
+  .route-steps { display: flex; flex-direction: column; gap: 6px; }
+  .route-step { display: grid; grid-template-columns: 18px 1fr; gap: 6px; font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .route-step-num { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--route-color, var(--text-dim)); }
+  .route-age { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--route-color, var(--text-dim)); display: block; margin-top: 2px; }
+  .route-merit { font-size: 11px; color: var(--text-dim); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+
+  .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .data-item { background: var(--panel2); border: 1px solid var(--border); padding: 12px 16px; }
+  .data-label { font-family: 'DotGothic16', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 0.15em; margin-bottom: 6px; }
+  .data-value { font-size: 14px; color: var(--white); font-weight: 500; }
+  .data-value .sub { font-size: 11px; color: var(--text-dim); font-weight: 300; }
+
+  .impact-box { background: var(--panel); border: 1px solid rgba(255,68,0,0.2); padding: 20px; }
+  .impact-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--siren); letter-spacing: 0.2em; margin-bottom: 10px; }
+  .impact-text { font-size: 13px; line-height: 2; color: var(--text); }
+
+  .related-list { display: flex; flex-direction: column; }
+  .related-item { display: flex; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(30,45,74,0.5); }
+  .related-name { font-size: 13px; color: var(--white); white-space: nowrap; }
+  .related-diff { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+  .creative-box { background: var(--panel); border: 1px solid rgba(255,68,0,0.25); padding: 20px; margin-top: 8px; }
+  .creative-title { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--siren); letter-spacing: 0.2em; margin-bottom: 12px; }
+  .creative-list { display: flex; flex-direction: column; gap: 8px; }
+  .creative-item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; font-size: 12px; line-height: 1.7; color: var(--text-dim); }
+  .creative-item::before { content: '▸'; color: var(--siren); font-family: 'DotGothic16', monospace; }
+
+  .card-footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .footer-series { font-family: 'DotGothic16', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.15em; line-height: 1.8; }
+  .footer-nav { font-family: 'DotGothic16', monospace; font-size: 11px; color: var(--siren); letter-spacing: 0.1em; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <span class="page-meta">職業名鑑 Vol.1 ── ヒーラー系統 ／ 守護者・蘇生特化</span>
+    <span class="page-num">p.08 別冊</span>
+  </div>
+
+  <div class="job-title-block">
+    <div class="job-system">系統：<span>守る・癒す（クロスジョブ）</span>　／　ジョブ：<span>ヒーラー（蘇生）＋ ガーディアン</span></div>
+    <h1 class="job-name">救急救命士</h1>
+    <div class="job-name-en">EMERGENCY LIFE-SAVING TECHNICIAN</div>
+    <div class="heal-badges">
+      <span class="badge badge-revive">蘇生</span>
+      <span class="badge badge-hp">HP回復（病院外）</span>
+      <span class="badge badge-san">SAN要求：極</span>
+      <span class="badge badge-str">STR必須</span>
+      <span class="badge badge-cross">消防×医療 クロスジョブ</span>
+    </div>
+  </div>
+
+  <div class="catch-copy">
+    <strong>救急車を運転する人＝救急救命士、ではない。</strong><br>
+    救急隊は3名体制。運転する機関員・指揮する隊長・処置する隊員。<br>
+    救急救命士は<strong>「病院の外で唯一、攻めの医療ができる」</strong>国家資格だ。<br>
+    心肺停止の患者に点滴を刺し、気道を確保し、<strong>死の淵から引き戻す</strong>。<br>
+    そして病院に着いた瞬間、その患者は救急医に引き渡される。<br>
+    <span class="dim">── ヒーラーでありながら、消防士でもある。唯一のクロスジョブ。</span>
+  </div>
+
+  <!-- まず知るべき分類 -->
+  <div class="classification-box">
+    <div class="cls-title">⚠ まず知っておくべき分類：「救急車に乗る人」は何種類もいる</div>
+    <div class="cls-grid">
+
+      <div class="cls-item" style="--cls-color: var(--siren);">
+        <div class="cls-name">消防救急隊員</div>
+        <div class="cls-desc">自治体消防署に所属。日本の救急車の大部分はこれ。サイレンを鳴らして出動できる。</div>
+        <div class="cls-key">必要資格：<span>消防士採用試験＋救急救命士</span></div>
+      </div>
+
+      <div class="cls-item" style="--cls-color: var(--siren2);">
+        <div class="cls-name">病院救急車の運転手</div>
+        <div class="cls-desc">大病院が所有する救急車の運転担当。主に転院搬送（病院→病院）に使用。</div>
+        <div class="cls-key">必要資格：<span>普通免許＋病院採用</span></div>
+      </div>
+
+      <div class="cls-item" style="--cls-color: var(--text-dim);">
+        <div class="cls-name">民間救急乗務員</div>
+        <div class="cls-desc">緊急性の低い移動（退院・通院）を担当する民間企業。サイレン使用不可。</div>
+        <div class="cls-key">必要資格：<span>普通免許（救命士資格は任意）</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 救急隊3名体制 -->
+  <div class="section">
+    <div class="section-label">TEAM ── 救急車の中の3名体制</div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-role">DRIVER</div>
+        <div class="team-name">機関員</div>
+        <div class="team-desc">救急車の運転専門。現場までの最速ルートを判断しながら安全に走る。</div>
+        <div class="team-stat">DEX高め ／ WIS必要<br>救急救命士資格は必須ではない</div>
+      </div>
+      <div class="team-card">
+        <div class="team-role">COMMANDER</div>
+        <div class="team-name">隊長</div>
+        <div class="team-desc">現場での指揮・状況判断・病院選定の責任者。経験豊富な上位隊員が担当。</div>
+        <div class="team-stat">WIS最重要 ／ SAN高め<br>救急救命士資格を持つ場合が多い</div>
+      </div>
+      <div class="team-card">
+        <div class="team-role">MEDIC</div>
+        <div class="team-name">救急救命士</div>
+        <div class="team-desc">処置の実施者。医師の指示下で点滴・気道確保・除細動などを行う。</div>
+        <div class="team-stat">INT＋DEX＋SAN全部必要<br>最低1名は搭乗義務あり</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ステータス（救急救命士として） -->
+  <div class="status-block">
+    <div class="status-header">ABILITY STATUS ── 救急救命士として</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--str);">STR</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--str);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">傷病者を抱えて階段を降りる・心臓マッサージを30分続ける・重器材を運ぶ</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--con);">CON</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--con);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">24時間交代制・深夜の出動・体力回復の間もなく次の現場へ</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--dex);">DEX</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--dex);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">揺れる救急車内での静脈路確保・外科医ほどではないが「動きながらの精密処置」</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--int);">INT</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:80%; background:var(--int);"></div></div>
+      <span class="stat-val">4</span>
+    </div>
+    <div class="stat-note">救急医学・薬理・解剖・プロトコル。病院内医師より範囲は狭いが現場密度は高い</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--wis);">WIS</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--wis);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">情報ゼロの現場で即座に重症度判定。「搬送先をどこにするか」の判断が命を左右する</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--cha);">CHA</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; background:var(--cha);"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+    <div class="stat-note">パニックになっている患者・家族を落ち着かせる声かけが処置と同時に必要</div>
+
+    <hr class="divider-line">
+    <div class="status-header">CONDITIONAL STATUS</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--san);">SAN</span>
+      <div class="stat-bar-wrap"><div class="stat-bar max" style="width:100%; background:var(--san);"></div></div>
+      <span class="stat-val">5</span>
+    </div>
+    <div class="stat-note">子どもの事故・多発外傷・手を尽くしても助からない現場。全職業でSAN要求トップクラス</div>
+
+    <div class="stat-row">
+      <span class="stat-label" style="color:var(--men);">MEN</span>
+      <div class="stat-bar-wrap"><div class="stat-bar" style="width:60%; background:var(--men);"></div></div>
+      <span class="stat-val">3</span>
+    </div>
+    <div class="stat-note">慢性消耗より「急性SAN削り」の繰り返し。燃え尽きより摩耗・PTSDリスク</div>
+  </div>
+
+  <!-- 職業特性 -->
+  <div class="trait-row">
+    <div class="trait-box">
+      <span class="trait-icon">🔮</span>
+      <div class="trait-name">ヒーラー度</div>
+      <div class="trait-stars" style="color:var(--siren);">█████</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">蘇生・直接介入</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">💀</span>
+      <div class="trait-name">精神汚染度</div>
+      <div class="trait-stars" style="color:var(--red);">████░</div>
+      <div style="font-size:10px; color:var(--red); margin-top:4px;">急性・強烈型</div>
+    </div>
+    <div class="trait-box">
+      <span class="trait-icon">👁</span>
+      <div class="trait-name">秘匿度</div>
+      <div class="trait-stars" style="color:var(--text-dim);">███░░</div>
+      <div style="font-size:10px; color:var(--text-dim); margin-top:4px;">救急車は知られてる<br>中身は知られてない</div>
+    </div>
+  </div>
+
+  <!-- 1日の流れ -->
+  <div class="section">
+    <div class="section-label">DAILY FLOW ── 1日の流れ（消防救急・24時間当務）</div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <span class="tl-time">8:30</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">当務開始・資器材点検</div>
+          <div class="tl-sub">除細動器・酸素ボンベ・薬剤・ストレッチャーを全件確認。これが命綱</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">随時</span>
+        <div class="tl-dot-col"><div class="tl-dot siren"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">出動（1日平均5〜10件）</div>
+          <div class="tl-sub">指令から60秒以内に出発が原則<br>
+          <span class="tl-alert">「心肺停止」「交通外傷」「小児の急変」── 何が来るかは指令が鳴るまでわからない</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">現場</span>
+        <div class="tl-dot-col"><div class="tl-dot siren"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">現場活動（平均10〜20分）</div>
+          <div class="tl-sub">状況確認→処置→搬送先選定→病院への連絡<br>
+          <span class="tl-alert">「この人を助けられるか」の判断を、情報が足りないまま下す</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">搬送中</span>
+        <div class="tl-dot-col"><div class="tl-dot siren"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">車内処置・病院への引き継ぎ</div>
+          <div class="tl-sub">揺れる車内で点滴・心電図モニタリングを継続。<br>
+          病院着と同時に救急医へバトンを渡す。ここで仕事が終わる</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">帰署後</span>
+        <div class="tl-dot-col"><div class="tl-dot normal"></div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">資器材洗浄・記録・次の出動待機</div>
+          <div class="tl-sub">車内を清潔に戻し、活動記録を書く。次の指令がいつ来るかはわからない</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <span class="tl-time">深夜</span>
+        <div class="tl-dot-col"><div class="tl-dot warn"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">仮眠中でも出動あり</div>
+          <div class="tl-sub">
+          <span class="tl-alert">仮眠室で寝ていても指令が鳴れば即起動。「完全な睡眠」がない24時間</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 救急医との違い -->
+  <div class="section">
+    <div class="section-label">vs 救急医 ── 何が違うのか</div>
+    <div class="real-box" style="border-left-color: var(--siren);">
+      <div class="real-box-title" style="color:var(--siren);">▸ 「病院の外」でしか使えない処置がある</div>
+      <div class="real-box-text">
+        救急救命士は<strong>「プレホスピタルケア（病院前救護）」</strong>の専門家だ。<br>
+        医師の指示下で使える処置は限定されているが、<br>
+        <strong>病院の外で患者に直接触れられる唯一の医療資格者</strong>でもある。<br><br>
+        救急医のゴールは「命を安定させて専門科に渡すこと」。<br>
+        救急救命士のゴールは<strong>「命を繋いで救急医に渡すこと」</strong>。<br>
+        <span class="dim">── 繋ぐ→渡す→治す。このリレーで命が助かる。</span>
+      </div>
+    </div>
+    <div class="real-box" style="border-left-color: var(--orange); margin-top:10px;">
+      <div class="real-box-title" style="color:var(--orange);">▸ STRとSANが救急医より高い理由</div>
+      <div class="real-box-text">
+        救急医は病院内で働く。救急救命士は<strong>事故現場・自宅・路上</strong>で働く。<br>
+        崩れた建物・炎・血の海・パニックになった家族── 全部対応する。<br>
+        病院のような「管理された環境」が一切ない。<br>
+        <strong>STRは「現場を動き回る体力」、SANは「見てはいけないものを見続ける耐性」。</strong><br>
+        <span class="dim">── 救急医がSAN4なら、救急救命士はSAN5が必要な現場に毎日行く。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- なるには（ルート分岐） -->
+  <div class="section">
+    <div class="section-label">HOW TO ── なるには？（ルートが複数ある）</div>
+    <div class="route-grid">
+
+      <div class="route-card" style="--route-color: var(--siren);">
+        <div class="route-label">ROUTE A ── 最短ルート</div>
+        <div class="route-steps">
+          <div class="route-step">
+            <span class="route-step-num">01</span>
+            <span>救急救命士養成課程のある専門学校（2年）または大学（4年）へ進学<span class="route-age">18歳入学</span></span>
+          </div>
+          <div class="route-step">
+            <span class="route-step-num">02</span>
+            <span>救急救命士国家試験に合格<span class="route-age">最短20歳（専門2年制）</span></span>
+          </div>
+          <div class="route-step">
+            <span class="route-step-num">03</span>
+            <span>消防士採用試験に合格→配属<span class="route-age">資格持ちで即戦力採用</span></span>
+          </div>
+        </div>
+        <div class="route-merit">✓ 最短20歳で現場に出られる<br>✓ 資格持ちで採用されやすい</div>
+      </div>
+
+      <div class="route-card" style="--route-color: var(--accent2);">
+        <div class="route-label">ROUTE B ── 消防士から目指す</div>
+        <div class="route-steps">
+          <div class="route-step">
+            <span class="route-step-num">01</span>
+            <span>高卒・大卒で消防士採用試験に合格<span class="route-age">学部・学科は不問</span></span>
+          </div>
+          <div class="route-step">
+            <span class="route-step-num">02</span>
+            <span>救急隊員として5年以上または2000時間以上の実務経験を積む</span>
+          </div>
+          <div class="route-step">
+            <span class="route-step-num">03</span>
+            <span>養成所で6ヶ月以上研修→国家試験合格<span class="route-age">最短でも27〜28歳前後</span></span>
+          </div>
+        </div>
+        <div class="route-merit">✓ 消防士として現場経験を積んでから<br>△ 資格取得まで時間がかかる</div>
+      </div>
+
+    </div>
+    <div class="warn-box">
+      <div class="warn-title">⚠ 消防士採用試験の壁</div>
+      <div class="warn-text">
+        救急救命士の国家資格を取っても、<strong>消防士採用試験に受からなければ救急車には乗れない</strong>。<br>
+        消防士採用は競争率が高く、体力試験・筆記・面接と関門が多い。<br>
+        近年は「救急救命士資格取得者優先枠」を設ける自治体も増加中。<br>
+        病院や民間救急会社に就職するルートなら消防士試験は不要。
+      </div>
+    </div>
+  </div>
+
+  <!-- データ -->
+  <div class="section">
+    <div class="section-label">DATA ── 数字で見る救急救命士</div>
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="data-label">平均年収（消防署勤務）</div>
+        <div class="data-value">500〜700万<span class="sub">（公務員給与＋各種手当）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">全国の救急救命士数</div>
+        <div class="data-value">約7万人<span class="sub">（消防署・病院・民間）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">最短で現場に出られる年齢</div>
+        <div class="data-value">20〜21歳<span class="sub">（2年制専門学校ルート）</span></div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">将来性</div>
+        <div class="data-value">★★★★☆<span class="sub">（高齢化で出動件数増加の一途）</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 社会的影響 -->
+  <div class="section">
+    <div class="section-label">IMPACT ── この職業がないと？</div>
+    <div class="impact-box">
+      <div class="impact-title">⚠ 救急救命士がいなくなったら</div>
+      <div class="impact-text">
+        病院に着くまでの時間に心肺停止の患者への処置が誰もできなくなる。<br>
+        心臓が止まってから脳にダメージが出始めるまで<strong>わずか4〜6分</strong>。<br>
+        病院到着まで平均8〜10分かかる日本では、<br>
+        この間に処置できる救急救命士の存在が生死を分ける。<br>
+        <span style="color:var(--text-dim); font-size:12px;">── 「救急車を呼んで待っていれば助かる」のは、救急救命士が車内で処置しているからだ。</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 似てるけど違う -->
+  <div class="section">
+    <div class="section-label">SIMILAR BUT DIFFERENT ── 似てるけど違う職業</div>
+    <div class="related-list">
+      <div class="related-item">
+        <span class="related-name">救急医</span>
+        <span class="related-diff">病院内で働く。より高度な処置・手術の指示ができる。救急救命士から命のバトンを受け取る側</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">消防士（救助隊）</span>
+        <span class="related-diff">救助・火災対応が主。救急隊と別部隊だが同じ消防署に所属。STRはさらに高い</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">看護師</span>
+        <span class="related-diff">病院内での処置が主。救急救命士より使える医療行為は広いが、病院外では動けない</span>
+      </div>
+      <div class="related-item">
+        <span class="related-name">民間救急乗務員</span>
+        <span class="related-diff">サイレンを鳴らせない・緊急処置は原則できない。「緊急でない搬送」専門の別職種</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 創作設定メモ -->
+  <div class="section">
+    <div class="section-label">FOR CREATORS ── 創作設定メモ</div>
+    <div class="creative-box">
+      <div class="creative-title">▸ このキャラを主人公にするなら</div>
+      <div class="creative-list">
+        <div class="creative-item">STR・CON・WIS全部5なのに「病院に着いた瞬間に権限がなくなる」── 最強なのに最後の一歩が届かない葛藤がドラマになる</div>
+        <div class="creative-item">SAN5要求だが、特定の現場（子どもの事故・かつての自分に似た患者）だけSANが削られる弱点を作りやすい</div>
+        <div class="creative-item">「助けた患者のその後を知れない」── ヒーラーなのに結果がわからない職業。その孤独が独特のテーマになる</div>
+        <div class="creative-item">消防士でもある── 火災・救助・救急を全部やるキャラとして設定できる。ジョブの複合が強み</div>
+        <div class="creative-item">ルートAで20歳から現場に出られる── 医師より10年早く「命の現場」に立つ若者の物語として機能する</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <div class="footer-series">
+      職業名鑑 Vol.1 ── ヒーラー系統<br>
+      #職業名鑑　#ヒーラー系統
+    </div>
+    <div class="footer-nav">NEXT：p.13 診療放射線技師 ▶</div>
+  </div>
+
+</div>
+</body>
+</html>
